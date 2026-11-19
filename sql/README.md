@@ -1,0 +1,64 @@
+# Scaffold SQL Klinik Pratama
+
+Paket ini adalah kerangka kerja SQL untuk tim baru yang mengerjakan proyek Klinik Pratama. Semua berkas di dalamnya hanya berisi komentar, penanda TODO, dan kontrak nama objek. Tidak ada satu pun pernyataan SQL yang aktif, jadi paket ini belum menjadi solusi dan tidak dapat dijalankan apa adanya.
+
+## Isi Paket
+
+| Berkas | Pemilik | Isi |
+| --- | --- | --- |
+| `sql/00-kesepakatan.sql` | P1 | Kesepakatan nama objek, aturan bisnis, kardinalitas, dan kebutuhan informasi. |
+| `sql/01_struktur.sql` | P3 | Sebelas tabel dasar beserta kunci primer, kunci asing, dan constraint. |
+| `sql/02_data.sql` | P2 | Jumlah baris, urutan pengisian, dan keadaan khusus data contoh untuk sebelas tabel. |
+| `sql/03_view_trigger.sql` | P4 | Dua view dan empat trigger kuota, bentrok jadwal, serta stok obat. |
+| `sql/04_prosedur.sql` | P4 | Dua prosedur pendaftaran kunjungan dan pembayaran. |
+| `sql/05_keamanan.sql` | P4 | Tiga user klinik beserta hak aksesnya. |
+| `sql/06_indeks.sql` | P4 | Dua indeks untuk pencarian pasien dan rentang tanggal kunjungan. |
+| `sql/07_pengujian.sql` | P5 | Sepuluh uji perilaku untuk constraint, trigger, prosedur, view, dan hak akses. |
+
+## Cara Pakai
+
+Salin folder `sql/` ini ke root repo baru yang masih kosong, lalu isi satu per satu sesuai urutan kerja. Berkas README ini boleh ikut disalin sebagai catatan kerja.
+
+Jangan menyalin paket ini ke repo yang sudah berisi solusi. Berkas dengan nama sama akan menimpa pekerjaan yang sudah ada dan menghapus hasil yang benar.
+
+## Urutan Kerja
+
+1. `01_struktur.sql`
+2. `02_data.sql`
+3. `03_view_trigger.sql`
+4. `04_prosedur.sql`
+5. `05_keamanan.sql`
+6. `06_indeks.sql`
+7. `07_pengujian.sql`, dikerjakan terpisah setelah enam berkas sebelumnya selesai.
+
+Berkas 03 sampai 06 bergantung pada 01 dan 02. View dan trigger membaca tabel dari 01, prosedur memakai data dari 02, dan pengujian di 07 memeriksa seluruh objek yang dibuat sebelumnya. Kerjakan 01 dan 02 lebih dulu sampai bersih.
+
+## Aturan Pengisian
+
+1. Kerjakan daftar TODO di kepala berkas milikmu: tulis pernyataan SQL pada blok objek terkait, lalu ganti `[ ]` menjadi `[x]`.
+2. Biarkan daftar TODO sampai fase ditutup. Tanda `[x]` menjadi bukti kemajuan.
+3. Jangan mengubah nama tabel, kolom, constraint, view, trigger, prosedur, atau user yang sudah ditetapkan.
+4. Jangan menyentuh berkas anggota lain. Setiap berkas punya pemilik tunggal.
+
+Tipe data dan detail tipe tidak disalin di scaffold. Rujuk [`../docs/PRD.md`](../docs/PRD.md) untuk kontrak lengkap.
+
+## Tool Pendukung
+
+Paket ini belum menyertakan `tools/reset-db.sh`, `tools/verify.sh`, dan `tools/demo-isolasi.sh`. Ketiganya ditulis P5 pada Fase F3 mengikuti [`../docs/panduan-P5-pengujian-rilis.md`](../docs/panduan-P5-pengujian-rilis.md).
+
+Perintah pemeriksaan di dalam scaffold memakai path repo kerja seperti `bash tools/reset-db.sh` dan `bash tools/verify.sh`. Perintah itu baru berguna setelah ketiga tool tersebut tersedia.
+
+## Kriteria Selesai
+
+Pekerjaan dinyatakan selesai jika seluruh kondisi berikut terpenuhi.
+
+1. `tabel terdaftar: 11`
+2. `Lulus: 34   Gagal: 0`
+3. Sepuluh uji di `07_pengujian.sql` memberi hasil sesuai kontrak.
+4. Berkas bukti diperbarui dari keluaran terakhir, bukan hasil percobaan sebelumnya.
+
+## Rujukan
+
+- [`../docs/PRD.md`](../docs/PRD.md)
+- [`../docs/PEMBAGIAN-TUGAS.md`](../docs/PEMBAGIAN-TUGAS.md)
+- [`../docs/panduan-P5-pengujian-rilis.md`](../docs/panduan-P5-pengujian-rilis.md)

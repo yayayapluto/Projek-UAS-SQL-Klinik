@@ -1,0 +1,183 @@
+-- =====================================================================
+-- 03_view_trigger.sql
+-- Pemilik : P4
+-- Fase    : F2 objek-sql
+-- Butuh   : 01_struktur.sql dan 02_data.sql
+-- Sumber  : PRD bagian 6 dan 8, panduan P4
+-- Tautan  : ../../docs/PRD.md dan ../../docs/panduan-P4-view-trigger-prosedur.md
+-- =====================================================================
+-- Berkas ini hanya berisi komentar. Tidak ada pernyataan SQL yang bisa
+-- dieksekusi. Isinya adalah rancangan dua view dan empat trigger untuk
+-- Sistem Informasi Klinik Pratama.
+--
+-- Daftar TODO P4. Ganti [ ] menjadi [x] setelah objek diuji.
+-- [ ] view v_kunjungan_lengkap
+-- [ ] view v_pendapatan_poli
+-- [ ] trigger trg_cek_kuota_jadwal
+-- [ ] trigger trg_cek_bentrok_jadwal
+-- [ ] trigger trg_cek_stok_obat
+-- [ ] trigger trg_kurangi_stok
+-- [ ] semua objek memakai DROP IF EXISTS dan aman diulang
+
+-- ---------------------------------------------------------------------
+-- 1. Aturan pengulangan
+-- ---------------------------------------------------------------------
+-- Setiap objek didahului DROP ... IF EXISTS dengan jenis objek yang sama,
+-- sehingga skrip aman dijalankan berulang di database yang sama.
+-- View didahulukan, trigger menyusul, karena trigger tidak bergantung pada
+-- view tetapi urutan ini menjaga berkas mudah dibaca.
+--
+-- DELIMITER hanya diperlukan klien mysql untuk membaca badan trigger yang
+-- memuat tanda titik koma. DELIMITER bukan perintah SQL dan tidak dikirim
+-- ke server. Klien lain, misalnya Workbench, menangani ini dengan cara
+-- sendiri.
+
+-- ---------------------------------------------------------------------
+-- 2. View v_kunjungan_lengkap
+-- ---------------------------------------------------------------------
+-- Satu baris view mewakili satu kunjungan, digabung dengan pasien, jadwal
+-- praktik, dokter, poli, dan pembayaran.
+--
+-- Bentuk gabungan:
+-- 1. kunjungan ke pasien memakai id_pasien.
+-- 2. kunjungan ke jadwal_praktik memakai id_jadwal.
+-- 3. jadwal_praktik ke dokter memakai id_dokter.
+-- 4. dokter ke poli memakai id_poli.
+-- 5. kunjungan ke pembayaran memakai id_kunjungan, dengan LEFT JOIN agar
+--    kunjungan yang belum ditagih tetap muncul.
+--
+-- Kolom keluaran, berurutan:
+-- id_kunjungan, tanggal_kunjungan, no_antrean, status_kunjungan,
+-- id_pasien, nama_pasien, id_dokter, nama_dokter, tipe_dokter,
+-- nama_poli, ruangan, jam_mulai, jam_selesai, status_bayar,
+-- total_tagihan.
+--
+-- status_bayar memakai COALESCE: bila baris pembayaran tidak ada, nilai
+-- yang tampil adalah Belum Ada Tagihan. total_tagihan dibiarkan NULL pada
+-- kondisi yang sama.
+--
+-- Tipe data tiap kolom mengikuti tabel asalnya. Rincian kolom dan tipe ada
+-- di ../../docs/PRD.md bagian 8.1.
+--
+-- Pada data contoh view ini menghasilkan 14 baris.
+
+-- ---------------------------------------------------------------------
+-- 3. View v_pendapatan_poli
+-- ---------------------------------------------------------------------
+-- Ringkasan pendapatan per poli per bulan.
+--
+-- Sumber baris adalah pembayaran, lalu dihubungkan ke kunjungan, jadwal
+-- praktik, dokter, dan poli. Hanya pembayaran berstatus Lunas yang ikut
+-- dihitung, supaya piutang tidak menambah angka pendapatan.
+--
+-- Kolom keluaran, berurutan:
+-- nama_poli, bulan, jumlah_kunjungan, total_pendapatan.
+--
+-- bulan diambil dari tanggal_kunjungan dengan format tahun-bulan, yaitu
+-- DATE_FORMAT pola %Y-%m.
+-- jumlah_kunjungan menghitung baris pembayaran lunas pada kelompok itu.
+-- total_pendapatan menjumlahkan total_tagihan pada kelompok yang sama.
+-- Pengelompokan memakai nama_poli dan bulan.
+
+-- ---------------------------------------------------------------------
+-- 4. Trigger trg_cek_kuota_jadwal
+-- ---------------------------------------------------------------------
+-- Waktu : BEFORE INSERT pada kunjungan.
+-- Tujuan: menolak pendaftaran yang melampaui kuota sesi praktik.
+--
+-- Langkah:
+-- 1. Bila status_kunjungan baru sama dengan Batal, tidak ada pemeriksaan.
+-- 2. Ambil kuota dari jadwal_praktik untuk id_jadwal baru.
+-- 3. Hitung kunjungan pada jadwal itu yang statusnya bukan Batal.
+-- 4. Bila jumlah terpakai sudah mencapai kuota, tolak dengan SQLSTATE
+--    45000 dan pesan Kuota jadwal sudah penuh.
+--
+-- Aturan bisnis nomor 1 di ../../docs/PRD.md bagian 6. Bukti: Uji 4.
+
+-- ---------------------------------------------------------------------
+-- 5. Trigger trg_cek_bentrok_jadwal
+-- ---------------------------------------------------------------------
+-- Waktu : BEFORE INSERT pada jadwal_praktik.
+-- Tujuan: satu dokter tidak memegang dua sesi beririsan pada tanggal yang
+-- sama.
+--
+-- Langkah:
+-- 1. Hitung jadwal lain dengan id_dokter sama dan tanggal sama.
+-- 2. Rentang dianggap beririsan bila jam_mulai lama lebih awal dari
+--    jam_selesai baru dan jam_selesai lama lebih akhir dari jam_mulai baru.
+-- 3. Bila ada satu saja yang beririsan, tolak dengan SQLSTATE 45000 dan
+--    pesan Jadwal dokter bentrok.
+--
+-- Perbandingan memakai NEW untuk nilai baris yang sedang disisipkan.
+-- Aturan bisnis nomor 2. Bukti: Uji 5.
+
+-- ---------------------------------------------------------------------
+-- 6. Trigger trg_cek_stok_obat
+-- ---------------------------------------------------------------------
+-- Waktu : BEFORE INSERT pada detail_resep.
+-- Tujuan: resep tidak boleh melebihi stok yang tersedia.
+--
+-- Langkah:
+-- 1. Ambil stok obat untuk id_obat baru.
+-- 2. Bandingkan dengan jumlah pada baris resep baru.
+-- 3. Bila stok lebih kecil dari jumlah, tolak dengan SQLSTATE 45000 dan
+--    pesan Stok obat tidak cukup.
+--
+-- Pemeriksaan berjalan sebelum baris disimpan, jadi stok masih utuh saat
+-- dibandingkan. Aturan bisnis nomor 7. Bukti: Uji 6.
+
+-- ---------------------------------------------------------------------
+-- 7. Trigger trg_kurangi_stok
+-- ---------------------------------------------------------------------
+-- Waktu : AFTER INSERT pada detail_resep.
+-- Tujuan: stok berkurang otomatis sebesar jumlah yang diresepkan.
+--
+-- Langkah:
+-- 1. Setelah baris resep tersimpan, perbarui obat pada id_obat yang sama.
+-- 2. Nilai stok baru adalah stok lama dikurangi jumlah resep.
+--
+-- Trigger ini tidak pernah mengirim pesan. Urutannya setelah
+-- trg_cek_stok_obat penting: pemeriksaan lebih dulu, pengurangan kemudian.
+-- Bila dibalik, stok sudah berkurang saat diperiksa dan pesan penolakan
+-- tidak lagi dapat diandalkan.
+-- Aturan bisnis nomor 7. Bukti: Uji 6.
+
+-- ---------------------------------------------------------------------
+-- 8. Ringkasan objek
+-- ---------------------------------------------------------------------
+-- View   : v_kunjungan_lengkap, v_pendapatan_poli.
+-- Trigger: trg_cek_kuota_jadwal, trg_cek_bentrok_jadwal,
+--          trg_cek_stok_obat, trg_kurangi_stok.
+-- Semua nama di atas persis seperti yang diperiksa verify.sh dan dipakai
+-- berkas berikutnya. Rincian kontrak ada di ../../docs/PRD.md bagian 8.
+
+-- ---------------------------------------------------------------------
+-- Pemeriksaan
+-- ---------------------------------------------------------------------
+-- Setelah 01_struktur.sql dan 02_data.sql dimuat, jalankan dari akar repo:
+--
+-- 1. bash tools/reset-db.sh
+--    Harapan: seluruh berkas 01 sampai 06 selesai tanpa galat, jumlah view
+--    di database menjadi 2.
+--
+-- 2. bash tools/verify.sh
+--    Harapan: 34 pemeriksaan lulus. Yang berkaitan dengan berkas ini:
+--    - Bagian C: baris view v_kunjungan_lengkap bernilai 14.
+--    - Bagian C: sisa kuota jadwal 7 bernilai 0.
+--    - Bagian E: pendaftaran melewati kuota ditolak dengan pesan
+--      Kuota jadwal sudah penuh.
+--    - Bagian E: jadwal dokter bentrok ditolak dengan pesan
+--      Jadwal dokter bentrok.
+--    - Bagian E: resep melebihi stok ditolak dengan pesan
+--      Stok obat tidak cukup.
+--
+-- 3. SELECT dari v_kunjungan_lengkap
+--    Harapan: 14 baris. Kunjungan tanpa pembayaran menampilkan
+--    Belum Ada Tagihan pada status_bayar.
+--
+-- 4. SELECT dari v_pendapatan_poli
+--    Harapan: baris per poli per bulan, hanya dari pembayaran Lunas.
+--
+-- 5. Uji 4, Uji 5, dan Uji 6 pada 07_pengujian.sql
+--    Harapan: masing-masing gagal dengan pesan yang tertulis di atas,
+--    bukan dengan galat kunci asing atau galat umum lainnya.
