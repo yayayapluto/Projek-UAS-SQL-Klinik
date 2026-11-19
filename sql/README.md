@@ -17,7 +17,7 @@ Paket ini adalah kerangka kerja SQL untuk tim baru yang mengerjakan proyek Klini
 
 ## Cara Pakai
 
-Salin folder `sql/` ini ke root repo baru yang masih kosong, lalu isi satu per satu sesuai urutan kerja. Berkas README ini boleh ikut disalin sebagai catatan kerja.
+Folder `sql/` ini sudah berada di repo kerja. Isi satu per satu sesuai urutan kerja.
 
 Jangan menyalin paket ini ke repo yang sudah berisi solusi. Berkas dengan nama sama akan menimpa pekerjaan yang sudah ada dan menghapus hasil yang benar.
 
@@ -40,11 +40,11 @@ Berkas 03 sampai 06 bergantung pada 01 dan 02. View dan trigger membaca tabel da
 3. Jangan mengubah nama tabel, kolom, constraint, view, trigger, prosedur, atau user yang sudah ditetapkan.
 4. Jangan menyentuh berkas anggota lain. Setiap berkas punya pemilik tunggal.
 
-Tipe data dan detail tipe tidak disalin di scaffold. Rujuk [`../docs/PRD.md`](../docs/PRD.md) untuk kontrak lengkap.
+Tipe data dan detail tipe tidak disalin di scaffold. Rujuk PRD di ZIP panduan, bagian 5, untuk kontrak lengkap.
 
 ## Tool Pendukung
 
-Paket ini belum menyertakan `tools/reset-db.sh`, `tools/verify.sh`, dan `tools/demo-isolasi.sh`. Ketiganya ditulis P5 pada Fase F3 mengikuti [`../docs/panduan-P5-pengujian-rilis.md`](../docs/panduan-P5-pengujian-rilis.md).
+Paket ini belum menyertakan `tools/reset-db.sh`, `tools/verify.sh`, dan `tools/demo-isolasi.sh`. Ketiganya ditulis P5 pada Fase F3 mengikuti panduan P5 di ZIP panduan.
 
 Perintah pemeriksaan di dalam scaffold memakai path repo kerja seperti `bash tools/reset-db.sh` dan `bash tools/verify.sh`. Perintah itu baru berguna setelah ketiga tool tersebut tersedia.
 
@@ -59,6 +59,4 @@ Pekerjaan dinyatakan selesai jika seluruh kondisi berikut terpenuhi.
 
 ## Rujukan
 
-- [`../docs/PRD.md`](../docs/PRD.md)
-- [`../docs/PEMBAGIAN-TUGAS.md`](../docs/PEMBAGIAN-TUGAS.md)
-- [`../docs/panduan-P5-pengujian-rilis.md`](../docs/panduan-P5-pengujian-rilis.md)
+- PRD, Pembagian Tugas, dan panduan P5 ada di ZIP panduan.
