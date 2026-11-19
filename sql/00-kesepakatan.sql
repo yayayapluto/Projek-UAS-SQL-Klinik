@@ -1,0 +1,141 @@
+-- =====================================================================
+-- 00-kesepakatan.sql
+-- Pemilik : P1
+-- Fase    : F0 kesepakatan-v1
+-- Butuh   : tidak ada
+-- Sumber  : PRD bagian 5 sampai 7, panduan P1
+-- Tautan  : ../../docs/PRD.md dan ../../docs/panduan-P1-studi-kasus-erd.md
+-- =====================================================================
+-- Berkas ini hanya berisi komentar. Tidak ada pernyataan SQL yang bisa
+-- dieksekusi. Isinya adalah kesepakatan kelompok sebelum menulis skema.
+
+-- ---------------------------------------------------------------------
+-- 1. Ruang lingkup
+-- ---------------------------------------------------------------------
+-- Yang masuk cakupan:
+-- 1. Pendaftaran pasien dan penjadwalan sesi praktik dokter.
+-- 2. Pencatatan kunjungan dan rekam medis.
+-- 3. Tindakan medis dan resep obat beserta stoknya.
+-- 4. Perhitungan tagihan dan pencatatan pembayaran.
+-- 5. Pelaporan kunjungan, sisa kuota, pendapatan poli, pemakaian obat.
+-- 6. Pengaturan hak akses, indeks, transaksi, dan pengujian.
+--
+-- Yang keluar cakupan:
+-- 1. Riwayat cicilan pembayaran, karena pembayaran dianggap lunas sekali bayar.
+-- 2. Klaim asuransi dan pengadaan obat dari pemasok, stok hanya berkurang.
+-- 3. Aplikasi antarmuka GUI, penilaian terfokus pada perancangan dan SQL.
+-- 4. Rawat inap, jadwal berulang mingguan, autentikasi aplikasi.
+-- Alasan lengkap tiap pembatasan ada di PRD bagian 4 dan laporan akhir.
+
+-- ---------------------------------------------------------------------
+-- 2. Delapan aturan bisnis, penjaga, dan bukti
+-- ---------------------------------------------------------------------
+-- 1. Kuota jadwal tidak boleh terlampaui.
+--    Penjaga : trg_cek_kuota_jadwal. Bukti : Uji 4.
+-- 2. Satu dokter tidak punya dua jadwal beririsan pada tanggal yang sama.
+--    Penjaga : trg_cek_bentrok_jadwal. Bukti : Uji 5.
+-- 3. Satu pasien hanya terdaftar sekali per sesi jadwal.
+--    Penjaga : uq_kunjungan_pasien. Bukti : verify.sh bagian E.
+-- 4. Resep hanya boleh dibuat setelah rekam medis ada.
+--    Penjaga : fk_detail_resep_rekam. Bukti : skema.
+-- 5. Satu kunjungan paling banyak punya satu baris pembayaran.
+--    Penjaga : uq_pembayaran_kunjungan. Bukti : Uji 8.
+-- 6. Total tagihan adalah biaya tindakan ditambah harga obat.
+--    Penjaga : sp_bayar_kunjungan menghitung sendiri. Bukti : Uji 7.
+-- 7. Stok obat berkurang otomatis saat resep disimpan dan tidak boleh melebihi stok.
+--    Penjaga : trg_kurangi_stok dan trg_cek_stok_obat. Bukti : Uji 6.
+-- 8. Status kunjungan hanya empat nilai: Menunggu, Diperiksa, Selesai, Batal.
+--    Penjaga : ENUM pada kolom status_kunjungan. Bukti : skema.
+--
+-- Catatan: aturan 1 menjaga jumlah pasien per sesi, aturan 7 menjaga
+-- jumlah obat per resep. Keduanya bekerja pada tabel berbeda.
+
+-- ---------------------------------------------------------------------
+-- 3. Sebelas entitas dan nama kolom persis
+-- ---------------------------------------------------------------------
+-- Daftar ini beku. Tipe data tidak diulang di sini, lihat ../../docs/PRD.md
+-- bagian 5.2 untuk tipe, constraint, dan aturan tiap kolom.
+--
+-- poli:
+--   id_poli, nama_poli, lantai
+-- dokter:
+--   id_dokter, id_poli, nama_dokter, no_sip, email, no_telp, tipe_dokter
+-- jadwal_praktik:
+--   id_jadwal, id_dokter, tanggal, jam_mulai, jam_selesai, ruangan, kuota
+-- pasien:
+--   id_pasien, nama_pasien, nik, email, no_telp, tanggal_lahir, alamat
+-- kunjungan:
+--   id_kunjungan, id_pasien, id_jadwal, tanggal_kunjungan, no_antrean,
+--   status_kunjungan
+-- rekam_medis:
+--   id_rekam, id_kunjungan, keluhan, diagnosis, tekanan_darah, suhu,
+--   berat_badan, tinggi_badan, imt, tanggal_periksa
+-- tindakan:
+--   id_tindakan, nama_tindakan, tarif
+-- detail_tindakan:
+--   id_detail_tindakan, id_kunjungan, id_tindakan, jumlah
+-- obat:
+--   id_obat, nama_obat, satuan, harga, stok
+-- detail_resep:
+--   id_detail_resep, id_rekam, id_obat, jumlah, aturan_pakai
+-- pembayaran:
+--   id_pembayaran, id_kunjungan, tanggal_bayar, metode, total_tagihan,
+--   status_bayar
+
+-- ---------------------------------------------------------------------
+-- 4. Kardinalitas
+-- ---------------------------------------------------------------------
+-- 1. poli 1:N dokter, satu poli punya banyak dokter.
+-- 2. dokter 1:N jadwal_praktik, satu dokter punya banyak sesi.
+-- 3. pasien 1:N kunjungan, satu pasien bisa banyak kunjungan.
+-- 4. jadwal_praktik 1:N kunjungan, satu sesi melayani banyak pasien.
+-- 5. kunjungan 1:0..1 rekam_medis, belum tentu setiap kunjungan diperiksa.
+-- 6. kunjungan M:N tindakan lewat detail_tindakan.
+-- 7. rekam_medis M:N obat lewat detail_resep.
+-- 8. kunjungan 1:0..1 pembayaran, satu tagihan per kunjungan.
+
+-- ---------------------------------------------------------------------
+-- 5. Kebutuhan informasi
+-- ---------------------------------------------------------------------
+-- Delapan kebutuhan informasi ringkas:
+-- 1. Pasien lahir sebelum 2005, diurutkan dari yang paling tua.
+-- 2. Dokter, poli tempat bertugas, dan lantai poli tersebut.
+-- 3. Riwayat kunjungan lengkap: pasien, dokter, poli, status.
+-- 4. Sisa kuota setiap jadwal praktik saat ini.
+-- 5. Kunjungan yang tagihannya belum lunas.
+-- 6. Pasien yang pernah dirujuk ke Poli Anak.
+-- 7. Poli dengan pendapatan di atas rata-rata.
+-- 8. Obat paling banyak keluar dan dokter penangan kunjungan terbanyak.
+--
+-- Q1 sampai Q10 pada PRD bagian 7 menjadi kontrak hasil. Sepuluh query
+-- itu beserta acuan keluarannya tidak boleh berubah tanpa kesepakatan.
+-- Q9 melatih CASE dan membaca sebaran biaya kunjungan.
+
+-- ---------------------------------------------------------------------
+-- 6. Checklist tag kesepakatan-v1
+-- ---------------------------------------------------------------------
+-- [x] Nama entitas dan kolom beku, sebelas tabel sesuai daftar di atas.
+-- [x] Delapan aturan bisnis punya penjaga teknis dan bukti pengujian.
+-- [x] Kardinalitas disepakati, delapan relasi sesuai daftar di atas.
+-- [x] Ruang lingkup disepakati, yang masuk dan keluar tercatat.
+-- [x] Pembagian berkas dicatat pada ../../docs/PEMBAGIAN-TUGAS.md.
+
+-- ---------------------------------------------------------------------
+-- Pemeriksaan
+-- ---------------------------------------------------------------------
+-- Berkas ini tidak dieksekusi, jadi tidak ada keluaran SQL yang diharapkan.
+-- Pemeriksaan kesesuaian paket scaffold dilakukan lewat tool repo kerja:
+--
+--   bash tools/reset-db.sh
+--   Keluaran diharapkan: seluruh berkas sql/ dieksekusi berurutan tanpa
+--   error, database klinik_pratama berisi 11 tabel, 2 view, 4 trigger,
+--   2 prosedur, 3 pengguna, dan 2 indeks.
+--
+--   bash tools/verify.sh
+--   Keluaran diharapkan: 34 pemeriksaan lulus, terbagi A 13, B 1, C 6,
+--   D 2, E 6, F 3, G 3, ditambah 10 uji pada 07_pengujian.sql lulus semua.
+--
+-- Untuk berkas ini khususnya, cukup dipastikan isinya hanya komentar:
+--   grep -v '^--' 00-kesepakatan.sql | grep -v '^$'
+--   Keluaran diharapkan: kosong, artinya tidak ada baris pernyataan aktif.
+-- =====================================================================
