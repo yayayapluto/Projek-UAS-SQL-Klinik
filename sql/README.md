@@ -42,11 +42,30 @@ Berkas 03 sampai 06 bergantung pada 01 dan 02. View dan trigger membaca tabel da
 
 Tipe data dan detail tipe tidak disalin di scaffold. Rujuk PRD di ZIP panduan, bagian 5, untuk kontrak lengkap.
 
+## Menjalankan Satu Berkas SQL
+
+Runner `tools/run-sql.sh` menjalankan satu berkas tanpa reset.
+
+```bash
+bash tools/run-sql.sh 02
+```
+
+Di CMD atau PowerShell:
+
+```text
+tools\run-sql.cmd 02
+```
+
+Runner mencari container `kbd-mysql`, lalu container `mysql`, lalu MySQL host
+seperti Laragon atau XAMPP. Opsi: `--name <container>` dan `--host`. Kata sandi
+container default `kbd`, host default kosong; set `KBD_PW` bila berbeda. Berkas
+`07` otomatis memakai `--force`.
+
 ## Tool Pendukung
 
-Paket ini belum menyertakan `tools/reset-db.sh`, `tools/verify.sh`, dan `tools/demo-isolasi.sh`. Ketiganya ditulis P5 pada Fase F3 mengikuti panduan P5 di ZIP panduan.
-
-Perintah pemeriksaan di dalam scaffold memakai path repo kerja seperti `bash tools/reset-db.sh` dan `bash tools/verify.sh`. Perintah itu baru berguna setelah ketiga tool tersebut tersedia.
+`tools/run-sql.sh` dan `tools/run-sql.cmd` sudah tersedia. Tool
+`tools/reset-db.sh`, `tools/verify.sh`, dan `tools/demo-isolasi.sh` ditulis P5
+pada Fase F3 mengikuti panduan P5 di ZIP panduan.
 
 ## Kriteria Selesai
 
