@@ -25,6 +25,12 @@ hasil ekstrak ZIP itu, bukan isi repo ini.
 Setiap berkas hanya berisi komentar dan daftar TODO. Ganti `[ ]` menjadi `[x]`
 setelah bagian itu selesai.
 
+| Lokasi | Isi |
+| --- | --- |
+| `sql/` | Scaffold berkomentar untuk delapan berkas SQL |
+| `tools/run-sql.sh` | Menjalankan satu berkas SQL ke container atau MySQL host |
+| `tools/run-sql.cmd` | Pembungkus untuk CMD dan PowerShell |
+
 ## Clone
 
 ```bash
@@ -32,8 +38,29 @@ git clone https://github.com/yayayapluto/Projek-UAS-SQL-Klinik.git
 cd Projek-UAS-SQL-Klinik
 ```
 
-Prasyarat, pembuatan database, dan urutan resmi ada di ZIP panduan. Tool
-`reset-db.sh`, `verify.sh`, dan `demo-isolasi.sh` ditulis P5 pada Fase F3.
+Prasyarat, pembuatan database, dan urutan resmi ada di ZIP panduan. Runner
+`tools/run-sql.sh` sudah tersedia; `reset-db.sh`, `verify.sh`, dan
+`demo-isolasi.sh` ditulis P5 pada Fase F3.
+
+## Menjalankan Satu Berkas SQL
+
+Setelah database siap, uji berkas yang sedang dikerjakan tanpa memuat ulang semua
+skrip:
+
+```bash
+bash tools/run-sql.sh 02
+```
+
+Di CMD atau PowerShell:
+
+```text
+tools\run-sql.cmd 02
+```
+
+Runner mencari container `kbd-mysql`, lalu container `mysql`, lalu MySQL host
+seperti Laragon atau XAMPP. Pakai `--name <container>` untuk container lain,
+`--host` untuk memaksa MySQL host. Kata sandi container default `kbd`, host
+default kosong; set `KBD_PW` bila berbeda. Berkas `07` otomatis memakai `--force`.
 
 ## Alur Kerja
 
@@ -66,5 +93,6 @@ Format commit: `feat:`, `fix:`, `docs:`, `test:`, atau `chore:`.
 4. Kata sandi `Klinik#2026` hanya untuk database latihan lokal.
 5. Jangan mengunggah data pasien nyata. Semua data contoh harus fiktif.
 6. Jangan menyalin folder panduan ZIP ke repo ini.
-7. Jalankan `bash tools/reset-db.sh` dan `bash tools/verify.sh` sebelum push.
-   Hasil akhir harus `Lulus: 34   Gagal: 0`.
+7. Jalankan `bash tools/run-sql.sh <nomor>` untuk berkas yang diubah. Setelah
+   P5 selesai, jalankan juga `bash tools/reset-db.sh` dan `bash tools/verify.sh`
+   sebelum push. Hasil akhir harus `Lulus: 34   Gagal: 0`.
