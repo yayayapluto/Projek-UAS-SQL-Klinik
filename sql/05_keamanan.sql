@@ -1,10 +1,10 @@
 -- =====================================================================
 -- 05_keamanan.sql
--- Pemilik : P4
+-- Pemilik : Anggota 5
 -- Fase    : F2 objek-sql
 -- Butuh   : 01_struktur.sql
--- Sumber  : PRD bagian 8, panduan P4
--- Tautan  : ../../docs/PRD.md dan ../../docs/panduan-P4-view-trigger-prosedur.md
+-- Sumber  : PRD bagian 8, panduan Anggota 5
+-- Tautan  : ../../docs/PRD.md dan ../../docs/panduan-anggota-5-keamanan-indeks.md
 -- =====================================================================
 -- Berkas ini hanya berisi komentar. Tidak ada pernyataan SQL yang bisa
 -- dieksekusi. Isinya adalah rancangan tiga pengguna database beserta
@@ -14,7 +14,7 @@
 -- diulang, lalu membuat pengguna baru dengan host %, lalu memberi hak,
 -- lalu FLUSH PRIVILEGES, lalu menampilkan SHOW GRANTS sebagai bukti.
 --
--- Daftar TODO P4. Ganti [ ] menjadi [x] setelah hak diuji.
+-- Daftar TODO Anggota 5. Ganti [ ] menjadi [x] setelah hak diuji.
 -- [ ] pengguna petugas_klinik dan haknya
 -- [ ] pengguna dokter_klinik dan haknya
 -- [ ] pengguna admin_klinik dan haknya
