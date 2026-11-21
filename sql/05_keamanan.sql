@@ -1,9 +1,9 @@
 -- =====================================================================
 -- 05_keamanan.sql
--- Pemilik : Anggota 5
+-- Pemilik : Kafka
 -- Fase    : F2 objek-sql
 -- Butuh   : 01_struktur.sql
--- Sumber  : PRD bagian 8, panduan Anggota 5
+-- Sumber  : PRD bagian 8, panduan Kafka
 -- Tautan  : ../../docs/PRD.md dan ../../docs/panduan-anggota-5-keamanan-indeks.md
 -- =====================================================================
 -- Berkas ini hanya berisi komentar. Tidak ada pernyataan SQL yang bisa
@@ -14,7 +14,7 @@
 -- diulang, lalu membuat pengguna baru dengan host %, lalu memberi hak,
 -- lalu FLUSH PRIVILEGES, lalu menampilkan SHOW GRANTS sebagai bukti.
 --
--- Daftar TODO Anggota 5. Ganti [ ] menjadi [x] setelah hak diuji.
+-- Daftar TODO Kafka. Ganti [ ] menjadi [x] setelah hak diuji.
 -- [ ] pengguna petugas_klinik dan haknya
 -- [ ] pengguna dokter_klinik dan haknya
 -- [ ] pengguna admin_klinik dan haknya

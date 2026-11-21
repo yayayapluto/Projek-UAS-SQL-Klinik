@@ -1,9 +1,9 @@
 -- =====================================================================
 -- 02_data.sql
--- Pemilik : Anggota 2
+-- Pemilik : Dapa
 -- Fase    : F1 skema-v1
 -- Butuh   : 01_struktur.sql
--- Sumber  : PRD bagian 7 dan 10, panduan Anggota 2
+-- Sumber  : PRD bagian 7 dan 10, panduan Dapa
 -- =====================================================================
 -- Berkas ini hanya berisi komentar. Tidak ada pernyataan SQL yang bisa
 -- dieksekusi. Isinya kontrak data contoh: urutan pengisian, jumlah baris,
@@ -13,7 +13,7 @@
 --   ../../docs/PRD.md bagian 7 dan bagian 10.
 --   ../../docs/panduan-anggota-2-normalisasi-data.md Milestone 2.
 --
--- Daftar TODO Anggota 2. Ganti [ ] menjadi [x] setelah tabel terisi.
+-- Daftar TODO Dapa. Ganti [ ] menjadi [x] setelah tabel terisi.
 -- [ ] poli 5 baris
 -- [ ] dokter 6 baris
 -- [ ] jadwal_praktik 8 baris
@@ -33,16 +33,16 @@
 -- ---------------------------------------------------------------------
 -- Tipe data, kunci primer, kunci tamu, dan constraint tidak diulang di
 -- sini. Semuanya dibaca dari ../../docs/PRD.md bagian 5 dan dari berkas
--- 01_struktur.sql milik Anggota 3.
+-- 01_struktur.sql milik Farras.
 --
 -- Berkas ini hanya mengisi data. Nama tabel, nama kolom, dan nama
--- constraint beku. Data yang ditolak constraint dilaporkan ke Anggota 3 dengan
+-- constraint beku. Data yang ditolak constraint dilaporkan ke Farras dengan
 -- pesan galat lengkap, bukan diperbaiki dengan menghapus constraint.
 
 -- ---------------------------------------------------------------------
 -- 2. Urutan pengisian dari induk ke anak
 -- ---------------------------------------------------------------------
--- Urutan ini mengikuti panduan Anggota 2 Milestone 2.1 dan PRD bagian 10.
+-- Urutan ini mengikuti panduan Dapa Milestone 2.1 dan PRD bagian 10.
 -- Tabel anak tidak bisa diisi sebelum induknya ada, karena setiap kunci
 -- tamu harus menunjuk baris yang sudah tersimpan.
 --
@@ -157,7 +157,7 @@
 --
 -- Kalau salah satu angka pada bagian 5 harus berubah, perbarui bersamaan:
 -- 1. PRD bagian 7 dan bagian 9.
--- 2. Panduan Anggota 2 Milestone 2.
+-- 2. Panduan Dapa Milestone 2.
 -- 3. bukti/10-kueri.txt dan bukti/verify.txt.
 -- 4. Tabel hasil pada laporan.
 --

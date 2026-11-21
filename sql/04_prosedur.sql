@@ -1,9 +1,9 @@
 -- =====================================================================
 -- 04_prosedur.sql
--- Pemilik : Anggota 1
+-- Pemilik : Agit
 -- Fase    : F2 objek-sql
 -- Butuh   : 01_struktur.sql dan 02_data.sql
--- Sumber  : PRD bagian 6 dan 8, panduan Anggota 4
+-- Sumber  : PRD bagian 6 dan 8, panduan Kenzie
 -- Tautan  : ../../docs/PRD.md dan ../../docs/panduan-anggota-4-view-trigger-prosedur.md
 -- =====================================================================
 -- Berkas ini hanya berisi komentar. Tidak ada pernyataan SQL yang bisa
@@ -14,7 +14,7 @@
 -- langkahnya berjalan dalam satu transaksi, dan kegagalan di tengah jalan
 -- tidak meninggalkan baris setengah jadi.
 --
--- Daftar TODO Anggota 4. Ganti [ ] menjadi [x] setelah prosedur diuji.
+-- Daftar TODO Kenzie. Ganti [ ] menjadi [x] setelah prosedur diuji.
 -- [ ] sp_daftar_kunjungan
 -- [ ] sp_bayar_kunjungan
 -- [ ] kedua prosedur memakai transaksi, handler rollback, dan dapat diulang
