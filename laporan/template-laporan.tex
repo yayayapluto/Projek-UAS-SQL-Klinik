@@ -1,0 +1,571 @@
+% =====================================================================
+% laporan/template-laporan.tex
+% Kerangka laporan akhir Final Project Konsep Basis Data.
+% Setiap bagian diberi komentar "% ISI:" yang menyebut bab panduan sumber
+% bahannya, supaya penulis tidak mulai dari halaman kosong.
+% Bangun dengan: bash tools/build.sh
+% =====================================================================
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[indonesian]{babel}
+\usepackage[a4paper,margin=2.5cm,top=3cm]{geometry}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric}
+\usepackage[most]{tcolorbox}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{sqlkata}{RGB}{0,90,160}
+\definecolor{sqlkomentar}{RGB}{90,120,90}
+\definecolor{kotakgaris}{RGB}{70,110,150}
+
+\lstdefinestyle{sql}{
+  language=SQL,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{sqlkata}\bfseries,
+  commentstyle=\color{sqlkomentar}\itshape,
+  numbers=left,numberstyle=\tiny\color{gray},numbersep=6pt,
+  frame=single,rulecolor=\color{kotakgaris},
+  breaklines=true,showstringspaces=false,tabsize=2
+}
+\lstset{style=sql}
+
+% Kotak untuk menempelkan tangkapan layar hasil eksekusi.
+\newtcolorbox{tangkapanlayar}[1]{
+  colback=gray!6,colframe=kotakgaris,boxrule=0.6pt,arc=2pt,
+  fonttitle=\bfseries\small,title={Tangkapan layar: #1},
+  height=6cm,valign=center,halign=center
+}
+
+\titleformat{\section}{\large\bfseries}{BAB \Roman{section}}{0.6em}{\centering}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{0.5em}{}
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+\setlist{nosep,leftmargin=1.5em}
+
+\begin{document}
+
+% ---------------------------------------------------------------------
+% Sampul laporan
+% ISI: data kelompok. Ganti bagian bergaris bawah dengan nama dan NIM.
+% ---------------------------------------------------------------------
+\begin{titlepage}
+  \centering
+  \vspace*{1.5cm}
+  {\Large\textbf{LAPORAN FINAL PROJECT}}\\[0.5em]
+  {\large KONSEP BASIS DATA}\\[2em]
+
+  {\LARGE\textbf{Sistem Informasi Klinik Pratama}}\\[1em]
+  {\large Perancangan dan Implementasi Basis Data Relasional}\\[3em]
+
+  \begin{tabular}{ll}
+    Disusun oleh: & \\[0.6em]
+    Anggota 1 & \underline{\hspace{5cm}} \\
+              & NIM \underline{\hspace{3cm}} \\[0.4em]
+    Anggota 2 & \underline{\hspace{5cm}} \\
+              & NIM \underline{\hspace{3cm}} \\[0.4em]
+    Anggota 3 & \underline{\hspace{5cm}} \\
+              & NIM \underline{\hspace{3cm}} \\[0.4em]
+    Anggota 4 & \underline{\hspace{5cm}} \\
+              & NIM \underline{\hspace{3cm}} \\[0.4em]
+    Anggota 5 & \underline{\hspace{5cm}} \\
+              & NIM \underline{\hspace{3cm}} \\
+  \end{tabular}\\[2.5em]
+
+  {\large Program Studi S1 Informatika}\\
+  {\large Fakultas Ilmu Komputer}\\
+  {\large Universitas Pembangunan Nasional Veteran Jakarta}\\
+  {\large 2026}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% =====================================================================
+\section{Deskripsi Basis Data}
+% =====================================================================
+
+\subsection{Latar belakang dan studi kasus}
+
+Klinik Pratama adalah klinik rawat jalan berskala kecil dengan lima poli: Poli
+Umum, Poli Anak, Poli Gigi, Poli Penyakit Dalam, dan Poli Mata. Setiap poli
+punya dokter sendiri, dan seorang dokter bertugas di satu poli. Dokter praktik
+pada sesi tertentu, misalnya tanggal 5 Agustus 2026 pukul 08.00 sampai 12.00 di
+ruang R-01 dengan kuota sepuluh pasien.
+
+Pelayanan berjalan dalam lima langkah. Pasien mendaftar di meja depan pada satu
+sesi jadwal, lalu menerima nomor antrean. Dokter memeriksa dan mencatat keluhan,
+diagnosis, tekanan darah, suhu, berat badan, serta tinggi badan. Setelah itu
+dokter memberi tindakan dan menulis resep. Di meja pembayaran, petugas
+menghitung tagihan dari biaya tindakan ditambah harga obat, lalu mencatat
+pembayaran. Setiap langkah menghasilkan data yang harus tersimpan pada tempat
+yang tepat, karena langkah berikutnya membaca hasil langkah sebelumnya.
+
+Basis data relasional dipilih karena tiga hal pada alur itu menuntut penjagaan
+mesin. Nomor antrean tidak boleh ganda pada satu jadwal, jumlah pasien tidak
+boleh melewati kuota, dan satu kunjungan hanya boleh punya satu baris
+pembayaran. Ketiganya bisa dinyatakan sebagai kunci unik, kunci tamu, atau
+trigger, sehingga pelanggaran ditolak database tanpa bergantung pada disiplin
+petugas. Pertimbangan kedua, laporan pendapatan per poli dan pemakaian obat
+membutuhkan penggabungan beberapa tabel yang sudah dinormalisasi. Pertimbangan
+ketiga, harga obat dan tarif tindakan berubah dari waktu ke waktu, dan rujukan
+ke satu baris master menjaga nilai lama tetap konsisten.
+
+\subsection{Ruang lingkup}
+
+Rancangan mencakup pendaftaran pasien, penjadwalan sesi praktik, kunjungan,
+rekam medis, tindakan, resep beserta stok obat, tagihan, pembayaran, pelaporan,
+hak akses, indeks, dan pengujian. Empat hal sengaja diletakkan di luar cakupan
+supaya batas pekerjaan jelas.
+
+\begin{table}[ht]
+\centering
+\caption{Hal di luar cakupan beserta alasannya}
+\small
+\begin{tabularx}{\textwidth}{@{}p{4.2cm}X@{}}
+\toprule
+\textbf{Di luar cakupan} & \textbf{Alasan} \\
+\midrule
+Riwayat cicilan pembayaran & Pembayaran dianggap lunas sekali bayar, sehingga status dan tanggal sudah memadai \\
+Pengadaan obat dari pemasok & Stok hanya berkurang lewat resep; penambahan dilakukan manual dengan SQL \\
+Jadwal berulang mingguan & Setiap sesi dicatat satu baris pada tanggal tertentu, nama hari diturunkan dengan \texttt{DAYNAME()} \\
+Autentikasi aplikasi & Hak akses diatur di tingkat database memakai \texttt{GRANT}, tanpa aplikasi \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Dua hal lain juga tidak diambil. Jenis kelamin pasien tidak dipakai satu pun
+kebutuhan informasi, dan aplikasi antarmuka tidak dibuat karena penilaian
+terfokus pada perancangan serta SQL.
+
+\subsection{Aturan bisnis}
+
+Aturan bisnis ditulis sebagai pernyataan yang bisa diperiksa mesin. Kalimat
+seperti ``pelayanan harus ramah'' tidak dipakai karena tidak punya penjaga
+teknis. Setiap aturan di bawah ini disertai penjaga dan pengujian yang
+membuktikannya.
+
+\begin{longtable}{@{}p{0.7cm}p{6.1cm}p{4.4cm}p{3.2cm}@{}}
+\caption{Delapan aturan bisnis, penjaga, dan bukti pengujian}
+\label{tab:aturan}\\
+\toprule
+\textbf{No} & \textbf{Aturan} & \textbf{Penjaga} & \textbf{Bukti} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{No} & \textbf{Aturan} & \textbf{Penjaga} & \textbf{Bukti} \\
+\midrule
+\endhead
+1 & Kuota jadwal tidak boleh terlampaui & trigger \texttt{trg\_cek\_kuota\_jadwal} & Uji 4 \\
+2 & Satu dokter tidak boleh punya dua jadwal beririsan pada tanggal yang sama & trigger \texttt{trg\_cek\_bentrok\_jadwal} & Uji 5 \\
+3 & Satu pasien hanya boleh terdaftar sekali pada satu sesi jadwal & \texttt{uq\_kunjungan\_pasien} & \texttt{verify.sh} bagian E \\
+4 & Resep hanya boleh dibuat setelah rekam medis ada & kunci tamu \texttt{fk\_detail\_resep\_rekam} & skema \\
+5 & Satu kunjungan punya paling banyak satu baris pembayaran & \texttt{uq\_pembayaran\_kunjungan} & Uji 8 \\
+6 & Total tagihan adalah jumlah biaya tindakan ditambah harga obat & \texttt{sp\_bayar\_kunjungan} menghitung sendiri & Uji 7 \\
+7 & Stok obat berkurang otomatis saat resep disimpan & \texttt{trg\_cek\_stok\_obat} dan \texttt{trg\_kurangi\_stok} & Uji 6 \\
+8 & Status kunjungan hanya salah satu dari empat nilai & \texttt{ENUM} pada \texttt{status\_kunjungan} & skema \\
+\bottomrule
+\end{longtable}
+
+Aturan 1 menjaga jumlah pasien per sesi, sedangkan aturan 7 menjaga jumlah obat
+per resep. Keduanya bekerja pada tabel berbeda dan diuji di skenario berbeda.
+Penolakan atas pelanggaran aturan 1, 2, dan 7 muncul sebagai galat 1644 dari
+trigger, sedangkan pelanggaran aturan 3, 5, dan 8 ditolak lewat kunci dan
+\texttt{ENUM}.
+
+\subsection{Peran dan tanggung jawab anggota}
+
+Pembagian peran mengikuti aturan satu berkas satu pemilik. Nama dan NIM diisi
+setelah data kelompok final; uraian pekerjaan di kolom kanan sudah tetap.
+
+\begin{table}[ht]
+\centering
+\caption{Pembagian peran anggota kelompok}
+\small
+\begin{tabularx}{\textwidth}{@{}p{0.8cm}p{3.4cm}X@{}}
+\toprule
+\textbf{No} & \textbf{Nama dan NIM} & \textbf{Tanggung jawab} \\
+\midrule
+1 & \underline{\hspace{3.4cm}} & Studi kasus, kamus data, ERD, delapan kebutuhan informasi, Bab I dan Bab III laporan, perbandingan NoSQL, video bagian konsep \\
+2 & \underline{\hspace{3.4cm}} & \texttt{sql/02\_data.sql}, dokumentasi normalisasi 1NF sampai BCNF, tangkapan layar query dasar, video bagian data \\
+3 & \underline{\hspace{3.4cm}} & \texttt{sql/01\_struktur.sql}, tabel transformasi, skema relasional, contoh aljabar relasional, video bagian skema \\
+4 & \underline{\hspace{3.4cm}} & \texttt{sql/03\_view\_trigger.sql} sampai \texttt{sql/06\_indeks.sql}, penjelasan view, trigger, prosedur, hak akses, dan indeks \\
+5 & \underline{\hspace{3.4cm}} & \texttt{sql/07\_pengujian.sql}, skrip \texttt{tools/}, berkas \texttt{bukti/}, demo isolasi, daftar periksa, video, build PDF \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Review silang berjalan dua arah. Anggota 3 memeriksa hasil Anggota 4 dan
+sebaliknya, Anggota 5 memeriksa hasil Anggota 1 dan Anggota 2, sedangkan
+Anggota 1 memeriksa daftar periksa buatan Anggota 5. Perubahan nama tabel atau
+kolom hanya lewat Anggota 3, dan perubahan angka data contoh hanya lewat
+Anggota 2.
+
+\subsection{Kamus data}
+
+Kamus data adalah daftar resmi nama entitas dan atributnya. Semua berkas SQL
+memakai nama pada Tabel \ref{tab:kamusdata}, sehingga tidak ada singkatan baru
+yang muncul di tengah pengerjaan. Tipe data dan nama constraint tidak diulang di
+sini karena sumbernya \texttt{sql/01\_struktur.sql}.
+
+\begin{longtable}{@{}p{3.1cm}p{5.4cm}p{7.4cm}@{}}
+\caption{Kamus data sebelas entitas}
+\label{tab:kamusdata}\\
+\toprule
+\textbf{Entitas} & \textbf{Atribut} & \textbf{Keterangan} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Entitas} & \textbf{Atribut} & \textbf{Keterangan} \\
+\midrule
+\endhead
+poli & id\_poli, nama\_poli, lantai & Tempat layanan. Nama poli unik. \\
+dokter & id\_dokter, id\_poli, nama\_dokter, no\_sip, email, no\_telp, tipe\_dokter & Tenaga medis. Nomor SIP dan email unik. \\
+jadwal\_praktik & id\_jadwal, id\_dokter, tanggal, jam\_mulai, jam\_selesai, ruangan, kuota & Satu baris untuk satu sesi pada satu tanggal. \\
+pasien & id\_pasien, nama\_pasien, nik, email, no\_telp, tanggal\_lahir, alamat & NIK 16 digit dan unik. \\
+kunjungan & id\_kunjungan, id\_pasien, id\_jadwal, tanggal\_kunjungan, no\_antrean, status\_kunjungan & Pendaftaran pasien pada satu sesi jadwal. \\
+rekam\_medis & id\_rekam, id\_kunjungan, keluhan, diagnosis, tekanan\_darah, suhu, berat\_badan, tinggi\_badan, imt, tanggal\_periksa & Hasil pemeriksaan. Satu kunjungan paling banyak satu rekam. \\
+tindakan & id\_tindakan, nama\_tindakan, tarif & Master tindakan dan tarifnya. \\
+detail\_tindakan & id\_detail\_tindakan, id\_kunjungan, id\_tindakan, jumlah & Tindakan yang dikerjakan pada satu kunjungan. \\
+obat & id\_obat, nama\_obat, satuan, harga, stok & Master obat dan sisa stok. \\
+detail\_resep & id\_detail\_resep, id\_rekam, id\_obat, jumlah, aturan\_pakai & Obat yang diresepkan pada satu rekam medis. \\
+pembayaran & id\_pembayaran, id\_kunjungan, tanggal\_bayar, metode, total\_tagihan, status\_bayar & Tagihan satu kunjungan. Satu kunjungan paling banyak satu baris. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Delapan kebutuhan informasi}
+
+Kebutuhan informasi dirumuskan sebagai pertanyaan supaya bisa langsung diuji
+dengan query. Kolom terakhir menyebut query yang menjawabnya pada
+\texttt{bukti/kueri-panduan.sql}.
+
+\begin{table}[ht]
+\centering
+\caption{Kebutuhan informasi dan query yang menjawabnya}
+\small
+\begin{tabularx}{\textwidth}{@{}p{0.7cm}Xp{2.2cm}@{}}
+\toprule
+\textbf{No} & \textbf{Pertanyaan} & \textbf{Query} \\
+\midrule
+1 & Pasien mana yang lahir sebelum 2005, diurutkan dari yang paling tua? & Q1 \\
+2 & Dokter mana bertugas di poli apa, dan poli itu di lantai berapa? & Q2 \\
+3 & Bagaimana riwayat kunjungan lengkap: pasien, dokter, poli, status? & Q3 \\
+4 & Berapa sisa kuota setiap jadwal praktik saat ini? & Q4 \\
+5 & Kunjungan mana yang tagihannya belum lunas? & Q5 \\
+6 & Pasien mana yang pernah dirujuk ke Poli Anak? & Q6 \\
+7 & Poli mana yang pendapatannya di atas rata-rata? & Q7 \\
+8 & Obat apa yang paling banyak keluar, dan dokter mana yang menangani kunjungan terbanyak? & Q8, Q10 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Dua pertanyaan pertama berhenti pada satu atau dua tabel. Sisanya menuntut
+penggabungan tiga tabel atau lebih, dan pertanyaan nomor 8 menuntut dua bentuk
+agregasi berbeda dalam satu kebutuhan.
+
+% =====================================================================
+\section{Perancangan dan Implementasi}
+% =====================================================================
+
+\subsection{Diagram relasi entitas}
+
+Gambar \ref{gam:erd-laporan} menampilkan sebelas entitas dan relasi di
+antaranya. Atribut tidak digambar supaya diagram tetap terbaca pada ukuran
+halaman; daftar atribut lengkap ada pada kamus data di Tabel
+\ref{tab:kamusdata}.
+
+\begin{figure}[ht]
+\centering
+\resizebox{0.98\textwidth}{!}{\input{../panduan/gambar/erd}}
+\caption{Diagram relasi entitas Sistem Informasi Klinik Pratama}
+\label{gam:erd-laporan}
+\end{figure}
+
+Delapan relasi pada diagram punya tiga bentuk kardinalitas. Relasi 1:N menjadi
+kunci tamu di sisi banyak, relasi 1:0..1 menjadi kunci tamu unik di sisi anak,
+dan relasi M:N menjadi tabel penghubung tersendiri. Tabel
+\ref{tab:kardinalitas-laporan} menuliskan kedelapan relasi beserta bentuk tabel
+hasilnya.
+
+\begin{table}[ht]
+\centering
+\caption{Kardinalitas relasi dan bentuk tabel hasil}
+\label{tab:kardinalitas-laporan}
+\small
+\begin{tabularx}{\textwidth}{@{}p{4.5cm}p{1.6cm}X@{}}
+\toprule
+\textbf{Relasi} & \textbf{Kardinalitas} & \textbf{Bentuk tabel hasil} \\
+\midrule
+poli memiliki dokter & 1 : N & kunci tamu \texttt{id\_poli} di \texttt{dokter} \\
+dokter punya jadwal praktik & 1 : N & kunci tamu \texttt{id\_dokter} di \texttt{jadwal\_praktik} \\
+pasien mendaftar kunjungan & 1 : N & kunci tamu \texttt{id\_pasien} di \texttt{kunjungan} \\
+jadwal diisi kunjungan & 1 : N & kunci tamu \texttt{id\_jadwal} di \texttt{kunjungan} \\
+kunjungan menghasilkan rekam medis & 1 : 0..1 & \texttt{id\_kunjungan} unik di \texttt{rekam\_medis} \\
+kunjungan menerima tindakan & M : N & tabel penghubung \texttt{detail\_tindakan} \\
+kunjungan ditagih pembayaran & 1 : 0..1 & \texttt{id\_kunjungan} unik di \texttt{pembayaran} \\
+rekam medis diresepkan obat & M : N & tabel penghubung \texttt{detail\_resep} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Delapan relasi itu menghasilkan sepuluh kunci tamu. Jumlahnya lebih besar dari
+jumlah relasi karena dua relasi 1:N menuju tabel yang sama, yaitu
+\texttt{kunjungan}, sehingga tabel itu memuat dua kunci tamu sekaligus.
+
+Satu catatan model extended ER berlaku pada entitas \texttt{dokter}. Model ER
+dasar tidak bisa menyatakan bahwa sebagian dokter adalah spesialis dan sebagian
+dokter umum. Model extended ER menggambarkannya sebagai spesialisasi, dengan
+dokter sebagai entitas induk dan dua subentitas di bawahnya. Implementasi di
+sini memilih satu tabel dengan kolom pembeda \texttt{tipe\_dokter} bertipe
+\texttt{ENUM('Umum','Spesialis')}. Atribut yang berbeda antar subentitas masih
+sedikit, sehingga memecah tabel menjadi tiga hanya menambah penggabungan tanpa
+manfaat nyata. Jika nanti dokter spesialis memerlukan belasan atribut sendiri,
+tabel terpisah baru masuk akal.
+
+\subsection{Transformasi ke skema relasional}
+% ISI: ambil dari Bab 7 panduan.
+% Tuliskan sebelas relasi hasil transformasi beserta kunci primer dan
+% kunci tamunya. Sebutkan aturan transformasi yang dipakai untuk relasi
+% 1:N, M:N, dan 1:0..1.
+
+\subsection{Normalisasi}
+% ISI: ambil dari Bab 8 panduan.
+% Jelaskan tahap unnormalized, 1NF, 2NF, 3NF, dan BCNF. Sertakan tabel
+% dependensi fungsional dan bukti bahwa setiap determinan adalah
+% candidate key.
+
+\subsection{Source code}
+% ISI: salin isi sql/01_struktur.sql sampai sql/07_pengujian.sql.
+% Kode tidak perlu seluruhnya; tampilkan bagian penting per berkas,
+% misalnya definisi tabel kunjungan, satu view, satu trigger, dan satu
+% prosedur.
+
+\subsubsection{Struktur tabel}
+\begin{lstlisting}
+-- ISI: tempel CREATE TABLE untuk tiga tabel inti, misalnya
+-- poli, kunjungan, dan rekam_medis, dari sql/01_struktur.sql.
+\end{lstlisting}
+
+\subsubsection{View dan trigger}
+\begin{lstlisting}
+-- ISI: tempel definisi v_kunjungan_lengkap dan trg_cek_kuota_jadwal
+-- dari sql/03_view_trigger.sql.
+\end{lstlisting}
+
+\subsubsection{Stored procedure}
+\begin{lstlisting}
+-- ISI: tempel definisi sp_bayar_kunjungan dari sql/04_prosedur.sql.
+\end{lstlisting}
+
+\subsubsection{Hak akses dan indeks}
+\begin{lstlisting}
+-- ISI: tempel CREATE USER, GRANT, dan CREATE INDEX dari
+-- sql/05_keamanan.sql dan sql/06_indeks.sql.
+\end{lstlisting}
+
+\subsection{Demo program}
+% ISI: ambil dari Bab 10, 11, 12, dan 13 panduan.
+% Setiap tangkapan layar diberi keterangan satu baris yang menyebut
+% perintah yang dijalankan dan hasil yang terlihat.
+
+\subsubsection{Data yang sudah dimuat}
+\begin{tangkapanlayar}{isi tabel kunjungan setelah reset-db.sh}
+  Tempel tangkapan layar di sini.
+\end{tangkapanlayar}
+
+\subsubsection{Hasil query lanjutan}
+\begin{tangkapanlayar}{hasil query Q3 dan Q4}
+  Tempel tangkapan layar di sini.
+\end{tangkapanlayar}
+
+\subsubsection{Penolakan aturan bisnis}
+\begin{tangkapanlayar}{pesan galat kuota jadwal sudah penuh}
+  Tempel tangkapan layar di sini.
+\end{tangkapanlayar}
+
+\subsubsection{Transaksi dan tingkat isolasi}
+\begin{tangkapanlayar}{keluaran tools/demo-isolasi.sh}
+  Tempel tangkapan layar di sini.
+\end{tangkapanlayar}
+
+\subsubsection{Hak akses dan indeks}
+\begin{tangkapanlayar}{hasil SHOW GRANTS dan EXPLAIN}
+  Tempel tangkapan layar di sini.
+\end{tangkapanlayar}
+
+\subsubsection{Pengujian otomatis}
+\begin{tangkapanlayar}{keluaran tools/verify.sh yang seluruhnya lulus}
+  Tempel tangkapan layar di sini.
+\end{tangkapanlayar}
+
+% =====================================================================
+\section{Kesimpulan dan Saran}
+% =====================================================================
+
+\subsection{Kesimpulan}
+
+Rancangan ini menjawab delapan kebutuhan informasi yang ditetapkan pada Bab I.
+Sebagian pertanyaan berhenti pada satu atau dua tabel, sedangkan pertanyaan
+tentang riwayat kunjungan dan pendapatan poli menuntut penggabungan lebih dari
+empat tabel. Riwayat kunjungan lengkap, misalnya, baru terjawab setelah
+\texttt{kunjungan}, \texttt{pasien}, \texttt{jadwal\_praktik}, \texttt{dokter},
+dan \texttt{poli} digabungkan, dan pertanyaan pendapatan per poli menambah
+\texttt{pembayaran} ke dalam penggabungan itu. Kesepuluh query menghasilkan
+angka yang sama dengan \texttt{bukti/10-kueri.txt}, termasuk 14 baris riwayat
+kunjungan, 3 tagihan belum lunas, dan Amlodipine 5mg sebanyak 60 tablet sebagai
+obat terbanyak.
+
+Sebelas tabel dan sepuluh kunci tamu sudah cukup mewakili alur klinik dari
+pendaftaran sampai pembayaran. Rancangan tidak menambah tabel keempat belas
+untuk keperluan yang belum ada, dan tidak menyimpan nilai turunan yang bisa
+dihitung. Indeks massa tubuh dihitung database, nama hari diambil dari tanggal,
+dan total tagihan dibentuk saat pembayaran dijalankan.
+
+Aturan bisnis ditegakkan mesin, bukan diingat petugas. \texttt{verify.sh}
+menjalankan 34 pemeriksaan dan berakhir dengan 34 lulus, 0 gagal. Pemeriksaan
+bagian E mencatat penolakan nyata: nomor antrean ganda ditolak dengan galat
+1062, pasien yang tidak terdaftar ditolak 1452, suhu 50 derajat ditolak 3819,
+pendaftaran melewati kuota dan jadwal bentrok ditolak 1644, begitu pula resep
+yang melebihi stok.
+
+Transaksi pembayaran memenuhi sifat seluruhnya atau tidak sama sekali.
+Pemanggilan pembayaran kedua ditolak dengan pesan \texttt{Kunjungan sudah
+dibayar}, dan percobaan insert yang gagal tidak menyisakan baris. Demo isolasi
+menunjukkan perbedaan dua tingkat isolasi pada kasus yang sama: pada READ
+COMMITTED pembacaan kedua melihat stok 195, sedangkan pada REPEATABLE READ
+pembacaan kedua tetap 195 setelah sesi lain mengubah nilainya, sesuai aturan
+tingkat isolasi tersebut.
+
+Hak akses dan indeks juga terbukti bekerja. Akun \texttt{petugas\_klinik}
+ditolak saat mencoba menulis ke tabel \texttt{obat} dengan galat 1142. Setelah
+\texttt{idx\_pasien\_nama} dibuat, rencana eksekusi berubah dari pemindaian
+penuh 10 baris menjadi pencarian rentang 1 baris; pada
+\texttt{idx\_kunjungan\_tanggal} jumlah baris yang diperiksa turun dari 14
+menjadi 3.
+
+\subsection{Kendala}
+
+Pemeriksaan \texttt{CHECK} baru ditegakkan MySQL mulai versi 8.0.16. Kelompok
+memutuskan memakai versi itu atau lebih baru pada seluruh mesin, karena
+menjalankan skrip pada versi lama membuat aturan rentang suhu, berat, dan tinggi
+tidak berfungsi tanpa pesan galat apa pun.
+
+Data contoh terikat pada 34 pemeriksaan sekaligus pada tabel hasil di panduan
+dan berkas \texttt{bukti/}. Satu angka yang berubah menuntut
+\texttt{tools/reset-db.sh}, \texttt{tools/verify.sh}, dan seluruh keluaran bukti
+dijalankan ulang. Karena itu penyuntingan \texttt{sql/02\_data.sql} dibatasi
+pada Anggota 2.
+
+Efek indeks pada tabel kecil terbatas. Tabel \texttt{pasien} hanya berisi 10
+baris dan \texttt{kunjungan} 14 baris, sehingga pemindaian penuh pun masih
+cepat. Perbedaan yang bisa dibuktikan ada pada rencana eksekusi dan jumlah baris
+yang diperiksa, bukan pada waktu tanggap.
+
+\subsection{Saran pengembangan}
+
+Pengadaan obat dari pemasok bisa ditambahkan sebagai tabel batch yang memuat
+nomor batch, tanggal kedaluwarsa, dan jumlah masuk. Konsekuensinya, kolom
+\texttt{stok} pada \texttt{obat} tidak lagi cukup sebagai satu angka, karena
+sisa stok harus dijumlahkan dari batch yang belum kedaluwarsa.
+
+Jadwal berulang mingguan bisa ditambahkan sebagai tabel pola jadwal ditambah
+tabel pengecualian tanggal. Trigger pemeriksa bentrok kemudian harus memeriksa
+sesi hasil perluasan pola, bukan hanya baris yang tersimpan langsung.
+
+Riwayat cicilan bisa ditambahkan sebagai tabel pembayaran rinci yang merujuk
+satu baris \texttt{pembayaran}. Dengan begitu \texttt{total\_tagihan} berubah
+menjadi nilai turunan dari jumlah cicilan, dan status lunas dihitung dari sisa
+tagihan.
+
+Dua saran operasional menyusul: pencadangan otomatis harian dengan
+\texttt{mysqldump}, dan laporan bulanan terjadwal yang membaca
+\texttt{v\_pendapatan\_poli} sehingga petugas tidak perlu menjalankan query
+manual.
+
+\subsection{Perbandingan dengan pendekatan NoSQL}
+
+Materi minggu 15 dinilai lewat pemetaan struktur, bukan pembangunan server
+NoSQL. Satu kunjungan beserta rekam medis dan resepnya bisa ditulis sebagai satu
+dokumen JSON seperti berikut.
+
+\begin{lstlisting}[numbers=none]
+{
+  "id_kunjungan": 8,
+  "tanggal_kunjungan": "2026-09-10",
+  "no_antrean": 1,
+  "status_kunjungan": "Selesai",
+  "pasien": { "id_pasien": 8, "nama_pasien": "Hesti Purwanti" },
+  "jadwal": {
+    "id_jadwal": 5,
+    "tanggal": "2026-09-10",
+    "jam_mulai": "08:00:00",
+    "jam_selesai": "11:00:00",
+    "dokter": { "id_dokter": 5, "nama_dokter": "dr. Eka Lestari, Sp.M" },
+    "poli": { "nama_poli": "Poli Mata", "lantai": "3" }
+  },
+  "rekam_medis": {
+    "keluhan": "Mata merah dan berair",
+    "diagnosis": "Konjungtivitis bakterial",
+    "tekanan_darah": "112/72",
+    "suhu": 37.1,
+    "imt": 21.5,
+    "resep": [
+      { "id_obat": 7, "nama_obat": "Salep Mata Kloramfenikol",
+        "jumlah": 1, "aturan_pakai": "Oles tipis 3x sehari" }
+    ]
+  },
+  "pembayaran": { "metode": "Tunai", "total_tagihan": 140000.00,
+                  "status_bayar": "Lunas" }
+}
+\end{lstlisting}
+
+Data yang hampir selalu dibaca bersama sebaiknya dilekatkan. Rekam medis dan
+resepnya selalu dibuka bersamaan saat dokter menelusuri riwayat, jadi keduanya
+masuk ke dalam dokumen kunjungan dan tidak perlu penggabungan tambahan. Data
+yang dipakai banyak dokumen sebaiknya dirujuk. Harga obat dan tarif tindakan
+dipakai ribuan kunjungan, sehingga menyalin nilainya ke setiap dokumen membuat
+satu perubahan harga harus diperbarui di semua tempat. Pada dokumen di atas,
+obat tetap dirujuk lewat \texttt{id\_obat}, sedangkan nama obat hanya disalin
+untuk keperluan tampilan.
+
+Skema relasional tetap lebih tepat untuk klinik ini, dan alasannya bukan
+kebiasaan memakai SQL. Alasan pertama, aturan bisnis di sini harus ditegakkan
+mesin, dan kunci unik, kunci tamu, \texttt{CHECK}, serta transaksi sudah
+melakukannya tanpa kode tambahan. Dokumen JSON tidak punya penjaga setara untuk
+nomor antrean ganda atau pembayaran ganda; keduanya harus diperiksa di lapisan
+aplikasi. Alasan kedua, sebagian besar kebutuhan informasi berupa agregasi
+lintas poli dan lintas dokter, misalnya pendapatan poli di atas rata-rata atau
+peringkat dokter. Agregasi semacam itu diselesaikan satu query pada tabel
+ternormalisasi, sedangkan pada dokumen menuntut pemrosesan seluruh koleksi.
+Alasan ketiga, harga obat dan tarif tindakan berubah dan nilai lama harus tetap
+konsisten pada transaksi yang sudah terjadi. Rujukan ke satu baris master
+menjamin hal itu, sementara penyalinan nilai ke dokumen membuka kemungkinan dua
+dokumen memuat harga berbeda untuk obat yang sama.
+
+% =====================================================================
+% Daftar pustaka
+% ISI: sesuaikan dengan sumber yang benar-benar dipakai. Cantumkan
+% modul kuliah dan dokumentasi resmi MySQL.
+% =====================================================================
+\begin{thebibliography}{9}
+  \bibitem{modul} Tim Pengampu Konsep Basis Data. \textit{Modul Kuliah Konsep
+    Basis Data}. Program Studi S1 Informatika, UPN Veteran Jakarta, 2026.
+  \bibitem{mysql} Oracle Corporation. \textit{MySQL 8.0 Reference Manual}.
+    \url{https://dev.mysql.com/doc/refman/8.0/en/}, diakses 2026.
+  \bibitem{elm} Elmasri, R. dan Navathe, S. B. \textit{Fundamentals of Database
+    Systems}. Edisi ke-7. Pearson, 2016.
+\end{thebibliography}
+
+\end{document}
