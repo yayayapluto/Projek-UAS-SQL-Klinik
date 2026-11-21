@@ -62,6 +62,25 @@ seperti Laragon atau XAMPP. Pakai `--name <container>` untuk container lain,
 `--host` untuk memaksa MySQL host. Kata sandi container default `kbd`, host
 default kosong; set `KBD_PW` bila berbeda. Berkas `07` otomatis memakai `--force`.
 
+## Tanpa Docker: XAMPP atau Laragon
+
+`tools/reset-db.sh`, `tools/verify.sh`, dan `tools/demo-isolasi.sh` memakai
+`tools/db.sh` untuk memilih koneksi: container `kbd-mysql` bila Docker hidup,
+kalau tidak MySQL host di `127.0.0.1:3306`. Klien `mysql` dicari di PATH,
+`C:/xampp/mysql/bin`, lalu `C:/laragon`.
+
+```text
+1. XAMPP Control Panel > Start pada baris MySQL (Apache tidak diperlukan).
+2. bash tools/reset-db.sh
+3. bash tools/verify.sh
+4. bash tools/demo-isolasi.sh
+```
+
+Setelan dapat diubah lewat `KBD_HOST`, `KBD_PORT`, `KBD_USER`, `KBD_ROOT_PW`,
+dan `KBD_CT`. Kata sandi root host dianggap kosong seperti bawaan XAMPP.
+XAMPP di Windows membawa MariaDB; seluruh 34 pemeriksaan lolos di sana, tetapi
+lingkungan rujukan proyek tetap MySQL 8.0.16.
+
 ## Alur Kerja
 
 Jangan bekerja langsung di `main`. Satu tugas satu branch.
