@@ -17,9 +17,9 @@ hasil ekstrak ZIP itu, bukan isi repo ini.
 | `sql/01_struktur.sql` | Anggota 3 | sebelas tabel, kunci, dan constraint |
 | `sql/02_data.sql` | Anggota 2 | jumlah baris dan keadaan khusus data contoh |
 | `sql/03_view_trigger.sql` | Anggota 4 | dua view dan empat trigger |
-| `sql/04_prosedur.sql` | Anggota 4 | dua prosedur pendaftaran dan pembayaran |
+| `sql/04_prosedur.sql` | Anggota 1 | dua prosedur pendaftaran dan pembayaran |
 | `sql/05_keamanan.sql` | Anggota 5 | tiga pengguna dan hak akses |
-| `sql/06_indeks.sql` | Anggota 5 | dua indeks dan bukti EXPLAIN |
+| `sql/06_indeks.sql` | Anggota 4 | dua indeks dan bukti EXPLAIN |
 | `sql/07_pengujian.sql` | Anggota 6 | sepuluh skenario pengujian |
 
 Setiap berkas hanya berisi komentar dan daftar TODO. Ganti `[ ]` menjadi `[x]`

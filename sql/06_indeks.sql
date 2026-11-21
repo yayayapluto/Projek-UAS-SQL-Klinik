@@ -1,6 +1,6 @@
 -- =====================================================================
 -- 06_indeks.sql
--- Pemilik : Anggota 5
+-- Pemilik : Anggota 4
 -- Fase    : F2 objek-sql
 -- Butuh   : 01_struktur.sql dan 02_data.sql
 -- Sumber  : PRD bagian 8 dan 9, panduan Anggota 5

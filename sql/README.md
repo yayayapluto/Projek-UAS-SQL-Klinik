@@ -10,9 +10,9 @@ Paket ini adalah kerangka kerja SQL untuk tim baru yang mengerjakan proyek Klini
 | `sql/01_struktur.sql` | Anggota 3 | Sebelas tabel dasar beserta kunci primer, kunci asing, dan constraint. |
 | `sql/02_data.sql` | Anggota 2 | Jumlah baris, urutan pengisian, dan keadaan khusus data contoh untuk sebelas tabel. |
 | `sql/03_view_trigger.sql` | Anggota 4 | Dua view dan empat trigger kuota, bentrok jadwal, serta stok obat. |
-| `sql/04_prosedur.sql` | Anggota 4 | Dua prosedur pendaftaran kunjungan dan pembayaran. |
+| `sql/04_prosedur.sql` | Anggota 1 | Dua prosedur pendaftaran kunjungan dan pembayaran. |
 | `sql/05_keamanan.sql` | Anggota 5 | Tiga user klinik beserta hak aksesnya. |
-| `sql/06_indeks.sql` | Anggota 5 | Dua indeks untuk pencarian pasien dan rentang tanggal kunjungan. |
+| `sql/06_indeks.sql` | Anggota 4 | Dua indeks untuk pencarian pasien dan rentang tanggal kunjungan. |
 | `sql/07_pengujian.sql` | Anggota 6 | Sepuluh uji perilaku untuk constraint, trigger, prosedur, view, dan hak akses. |
 
 ## Cara Pakai
