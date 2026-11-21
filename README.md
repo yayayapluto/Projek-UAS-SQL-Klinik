@@ -34,8 +34,10 @@ git clone https://github.com/yayayapluto/Projek-UAS-SQL-Klinik.git
 cd Projek-UAS-SQL-Klinik
 ```
 
-Prasyarat, pembuatan database, dan urutan resmi ada di ZIP panduan. Tool
-`reset-db.sh`, `verify.sh`, dan `demo-isolasi.sh` ditulis Rassya pada Fase F3.
+Prasyarat, pembuatan database, dan urutan resmi ada di ZIP panduan. Folder
+`tools/` sudah tersedia lengkap (`reset-db.sh`, `verify.sh`, `demo-isolasi.sh`,
+`build.sh`, `run-sql.sh`); itu alat bantu bersama, jangan ditulis ulang atau
+diubah tanpa kesepakatan. Semua anggota cukup memakai perintahnya.
 
 ## Alur Kerja
 
