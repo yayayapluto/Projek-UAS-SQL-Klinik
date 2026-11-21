@@ -1,0 +1,223 @@
+-- =====================================================================
+-- 07_pengujian.sql
+-- Pemilik : P5
+-- Fase    : F3 uji-hijau
+-- Butuh   : 01_struktur.sql sampai 06_indeks.sql, dimuat lewat
+--           bash tools/reset-db.sh sebelum berkas ini dijalankan.
+-- Sumber  : PRD bagian 10 dan 11, panduan P5
+-- Tautan  : ../../docs/PRD.md dan ../../docs/panduan-P5-pengujian-rilis.md
+-- =====================================================================
+-- Berkas ini hanya berisi komentar. Tidak ada pernyataan SQL yang bisa
+-- dieksekusi. Isinya adalah cetak biru sepuluh skenario pengujian.
+-- Versi final berisi pernyataan nyata dan dikerjakan pada repo kerja.
+--
+-- Daftar TODO P5. Ganti [ ] menjadi [x] setelah uji dijalankan.
+-- [ ] Uji 1 antrean ganda
+-- [ ] Uji 2 pasien tidak terdaftar
+-- [ ] Uji 3 suhu di luar rentang
+-- [ ] Uji 4 kuota jadwal penuh
+-- [ ] Uji 5 jadwal dokter bentrok
+-- [ ] Uji 6 resep melebihi stok
+-- [ ] Uji 7 alur normal daftar, periksa, bayar
+-- [ ] Uji 8 pembayaran kedua ditolak
+-- [ ] Uji 9 view gabungan
+-- [ ] Uji 10 hak akses petugas
+-- [ ] blok pembersihan data uji
+--
+-- Cara menjalankan versi final (wajib opsi --force karena uji 1 sampai 6
+-- dan uji 10 sengaja dibuat gagal):
+--   docker exec -i kbd-mysql mysql -uroot -pkbd --force < sql/07_pengujian.sql
+-- Keluaran disimpan ke bukti/07_pengujian.txt.
+--
+-- Aturan penting:
+-- 1. Jangan mengubah data contoh dari 02_data.sql. Angka uji seperti
+--    jadwal 7 penuh dan obat 8 berstok 5 adalah kontrak.
+-- 2. Blok pembersihan di akhir wajib ada supaya pengujian kedua tidak
+--    mengubah jumlah baris laporan. Urutan hapus dari anak ke induk.
+-- 3. Rincian tipe data dan constraint tidak diulang di sini, lihat
+--    ../../docs/PRD.md bagian 5.2 dan 5.4.
+--
+-- ---------------------------------------------------------------------
+-- UJI 1. Nomor antrean ganda pada satu jadwal
+-- ---------------------------------------------------------------------
+-- Tujuan     : membuktikan UNIQUE uq_kunjungan_antrean menolak dua pasien
+--              dengan nomor antrean sama pada satu jadwal.
+-- Keadaan    : jadwal 2 sudah memiliki kunjungan pasien lain dengan
+--              nomor antrean 1 pada 2026-08-06.
+-- Langkah    : sisipkan baris kunjungan baru untuk pasien 5 pada jadwal 2,
+--              tanggal 2026-08-06, nomor antrean 1, status Menunggu.
+-- Harapan    : galat 1062 Duplicate entry, pesan menyebut
+--              uq_kunjungan_antrean, kunci ganda 2-1.
+--
+-- ---------------------------------------------------------------------
+-- UJI 2. Kunjungan dengan pasien tidak terdaftar
+-- ---------------------------------------------------------------------
+-- Tujuan     : membuktikan kunci tamu fk_kunjungan_pasien menolak
+--              kunjungan tanpa pasien yang ada.
+-- Keadaan    : pasien dengan id 999 tidak ada di tabel pasien.
+-- Langkah    : sisipkan baris kunjungan dengan id_pasien 999 pada jadwal 1,
+--              tanggal 2026-08-05, nomor antrean 9, status Menunggu.
+-- Harapan    : galat 1452 Cannot add or update a child row, foreign key
+--              fk_kunjungan_pasien gagal.
+--
+-- ---------------------------------------------------------------------
+-- UJI 3. Suhu tubuh di luar rentang wajar
+-- ---------------------------------------------------------------------
+-- Tujuan     : membuktikan CHECK ck_rekam_suhu menolak suhu mustahil.
+-- Keadaan    : rekam medis dengan id_rekam 1 sudah ada dari data contoh.
+-- Langkah    : perbarui rekam medis id 1, isi kolom suhu dengan 50.0.
+-- Harapan    : galat 3819 Check constraint ck_rekam_suhu is violated.
+--
+-- ---------------------------------------------------------------------
+-- UJI 4. Pendaftaran melewati kuota jadwal
+-- ---------------------------------------------------------------------
+-- Tujuan     : membuktikan trigger trg_cek_kuota_jadwal menolak pasien
+--              baru saat kuota sesi sudah habis.
+-- Keadaan    : jadwal 7 berkuota 4 dan sudah terisi 4 kunjungan yang tidak
+--              berstatus Batal, sesuai data contoh 02_data.sql.
+-- Langkah    : sisipkan baris kunjungan untuk pasien 5 pada jadwal 7,
+--              tanggal 2026-10-07, nomor antrean 5, status Menunggu.
+-- Harapan    : galat dari SIGNAL SQLSTATE 45000, pesan persis
+--              Kuota jadwal sudah penuh.
+--
+-- ---------------------------------------------------------------------
+-- UJI 5. Jadwal dokter bentrok
+-- ---------------------------------------------------------------------
+-- Tujuan     : membuktikan trigger trg_cek_bentrok_jadwal menolak sesi
+--              baru yang beririsan dengan sesi dokter yang sama.
+-- Keadaan    : dokter 1 sudah praktik pukul 08.00 sampai 12.00 pada
+--              tanggal 2026-08-05 sesuai data contoh.
+-- Langkah    : sisipkan baris jadwal_praktik untuk dokter 1, tanggal
+--              2026-08-05, jam 10.00 sampai 11.00, ruangan R-02, kuota 5.
+-- Harapan    : galat dari SIGNAL SQLSTATE 45000, pesan persis
+--              Jadwal dokter bentrok.
+--
+-- ---------------------------------------------------------------------
+-- UJI 6. Resep melebihi stok obat
+-- ---------------------------------------------------------------------
+-- Tujuan     : membuktikan trigger trg_cek_stok_obat menolak resep yang
+--              jumlahnya lebih besar dari stok tersisa.
+-- Keadaan    : obat 8 (Obat Batuk Sirup) berstok 5, rekam medis id 1 ada.
+-- Langkah    : sisipkan baris detail_resep untuk rekam 1, obat 8,
+--              jumlah 99, aturan pakai 3x1 sendok teh.
+-- Harapan    : galat dari SIGNAL SQLSTATE 45000, pesan persis
+--              Stok obat tidak cukup.
+--
+-- ---------------------------------------------------------------------
+-- UJI 7. Alur normal daftar, periksa, bayar
+-- ---------------------------------------------------------------------
+-- Tujuan     : membuktikan prosedur sp_daftar_kunjungan dan
+--              sp_bayar_kunjungan bekerja pada alur yang sah, dan total
+--              tagihan sama dengan hitungan manual.
+-- Keadaan    : jadwal uji dibuat baru bertanggal masa depan karena
+--              prosedur menolak jadwal yang sudah lewat; seluruh jadwal
+--              contoh dari 02_data.sql sudah lewat. Jadwal uji: dokter 3,
+--              2026-12-20, pukul 09.00 sampai 12.00, ruangan R-03, kuota 5.
+-- Langkah    :
+--   1. Sisipkan jadwal uji lalu simpan id barunya ke variabel sesi.
+--   2. Panggil sp_daftar_kunjungan untuk pasien 10 pada jadwal uji,
+--      simpan id kunjungan hasilnya.
+--   3. Sisipkan rekam medis: keluhan Gigi berlubang, diagnosis Karies
+--      dentin, tekanan 120/80, suhu 36.7, berat 62.0, tinggi 165.0.
+--   4. Sisipkan satu tindakan (id 3, jumlah 1) dan satu resep
+--      (obat 1, jumlah 10) pada kunjungan uji.
+--   5. Panggil sp_bayar_kunjungan dengan metode Tunai.
+-- Harapan    : nomor antrean yang dihasilkan 1; total tagihan 155000.00,
+--              yaitu tindakan 150000 ditambah obat 5000; baris pembayaran
+--              tersimpan dengan status Lunas. Cocokkan dengan hitungan
+--              manual dari SUM tarif tindakan dan harga obat, bukan angka
+--              yang ditulis tangan.
+--
+-- ---------------------------------------------------------------------
+-- UJI 8. Membayar kunjungan yang sudah lunas
+-- ---------------------------------------------------------------------
+-- Tujuan     : membuktikan sp_bayar_kunjungan menolak pembayaran kedua.
+-- Keadaan    : kunjungan uji dari Uji 7 sudah punya satu baris pembayaran
+--              berstatus Lunas; UNIQUE uq_pembayaran_kunjungan juga
+--              menjaga satu tagihan per kunjungan.
+-- Langkah    : panggil lagi sp_bayar_kunjungan untuk kunjungan uji yang
+--              sama dengan metode Tunai.
+-- Harapan    : galat dari SIGNAL SQLSTATE 45000, pesan persis
+--              Kunjungan sudah dibayar, tidak ada baris pembayaran baru.
+--
+-- ---------------------------------------------------------------------
+-- UJI 9. View gabungan v_kunjungan_lengkap
+-- ---------------------------------------------------------------------
+-- Tujuan     : membuktikan view menampilkan riwayat kunjungan lengkap.
+-- Keadaan    : setelah seluruh uji sebelumnya dan sebelum pembersihan,
+--              view memuat 14 baris, termasuk kunjungan uji dari Uji 7.
+-- Langkah    : baca view v_kunjungan_lengkap diurutkan berdasarkan
+--              id_kunjungan, tampilkan kolom nama pasien, dokter, poli,
+--              dan status_bayar.
+-- Harapan    : view menampilkan 14 baris; kolom pasien, dokter, poli,
+--              dan status_bayar terisi untuk setiap baris, tidak ada
+--              nilai kosong pada kunjungan yang sudah diperiksa.
+--
+-- ---------------------------------------------------------------------
+-- UJI 10. Hak akses petugas
+-- ---------------------------------------------------------------------
+-- Tujuan     : membuktikan petugas_klinik hanya boleh membaca dan tidak
+--              boleh menulis tabel apa pun.
+-- Keadaan    : pengguna petugas_klinik pada host % sudah dibuat oleh
+--              05_keamanan.sql dengan kata sandi Klinik#2026.
+-- Langkah    :
+--   1. Jalankan SHOW GRANTS untuk petugas_klinik pada host %.
+--   2. Percobaan INSERT ke tabel obat TIDAK ditulis di berkas ini karena
+--      skrip dijalankan sebagai root. Jalankan terpisah di luar skrip,
+--      sebagai petugas_klinik:
+--      docker exec -i kbd-mysql mysql -upetugas_klinik -p'Klinik#2026'
+--        klinik_pratama -e "pernyataan INSERT satu baris ke tabel obat"
+-- Harapan    : SHOW GRANTS menampilkan hanya hak SELECT dan EXECUTE pada
+--              basis data klinik_pratama; percobaan INSERT ditolak dengan
+--              galat 1142 command denied to user petugas_klinik for
+--              table obat.
+--
+-- ---------------------------------------------------------------------
+-- PEMBERSIHAN
+-- ---------------------------------------------------------------------
+-- Tujuan     : mengembalikan isi tabel persis seperti setelah
+--              02_data.sql supaya pengujian bisa dijalankan berulang dan
+--              jumlah baris laporan tetap stabil.
+-- Urutan     : dari anak ke induk.
+--   1. Hapus baris pembayaran milik kunjungan uji.
+--   2. Hapus baris detail_resep milik rekam medis uji.
+--   3. Hapus baris detail_tindakan milik kunjungan uji.
+--   4. Hapus rekam medis uji.
+--   5. Hapus kunjungan uji.
+--   6. Hapus jadwal uji.
+--   7. Kembalikan stok obat 1 sebesar jumlah yang terpakai resep uji
+--      (tambah 10) karena trg_kurangi_stok sudah menguranginya.
+--   8. Cetak jumlah baris kunjungan, pembayaran, jadwal_praktik, dan
+--      rekam_medis sebagai bukti akhir pembersihan.
+-- Harapan    : jumlah baris sama dengan kondisi setelah reset-db.sh;
+--              data contoh tidak berubah.
+--
+-- ---------------------------------------------------------------------
+-- Pemeriksaan
+-- ---------------------------------------------------------------------
+-- Pemeriksaan dilakukan lewat tool repo kerja, bukan lewat berkas ini:
+--
+--   bash tools/reset-db.sh
+--   Keluaran diharapkan: skrip 01 sampai 06 dimuat berurutan tanpa
+--   galat, database klinik_pratama berisi 11 tabel, 2 view, 4 trigger,
+--   2 prosedur, 3 pengguna, dan 2 indeks.
+--
+--   docker exec -i kbd-mysql mysql -uroot -pkbd --force < sql/07_pengujian.sql
+--   Keluaran diharapkan: uji 1 galat 1062 uq_kunjungan_antrean; uji 2
+--   galat 1452 fk_kunjungan_pasien; uji 3 galat 3819 ck_rekam_suhu;
+--   uji 4 pesan Kuota jadwal sudah penuh; uji 5 pesan Jadwal dokter
+--   bentrok; uji 6 pesan Stok obat tidak cukup; uji 7 antrean 1 dan
+--   total 155000.00 sama dengan hitungan manual; uji 8 pesan Kunjungan
+--   sudah dibayar; uji 9 view 14 baris dengan pasien, dokter, poli, dan
+--   status_bayar terisi; uji 10 SHOW GRANTS tampil dan INSERT terpisah
+--   sebagai petugas ditolak galat 1142. Pembersihan berakhir dengan
+--   jumlah baris yang sama seperti setelah 02_data.sql.
+--
+--   bash tools/verify.sh
+--   Keluaran diharapkan: Lulus: 34   Gagal: 0, terbagi A 13, B 1, C 6,
+--   D 2, E 6, F 3, G 3, diikuti baris SEMUA PEMERIKSAAN LULUS.
+--
+-- Untuk berkas ini khususnya, cukup dipastikan isinya hanya komentar:
+--   grep -v '^--' 07_pengujian.sql | grep -v '^$'
+--   Keluaran diharapkan: kosong, artinya tidak ada baris pernyataan aktif.
+-- =====================================================================
