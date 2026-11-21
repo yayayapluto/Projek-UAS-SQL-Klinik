@@ -1,16 +1,16 @@
 -- =====================================================================
 -- 06_indeks.sql
--- Pemilik : Anggota 4
+-- Pemilik : Kenzie
 -- Fase    : F2 objek-sql
 -- Butuh   : 01_struktur.sql dan 02_data.sql
--- Sumber  : PRD bagian 8 dan 9, panduan Anggota 5
+-- Sumber  : PRD bagian 8 dan 9, panduan Kafka
 -- Tautan  : ../../docs/PRD.md dan ../../docs/panduan-anggota-5-keamanan-indeks.md
 -- =====================================================================
 -- Berkas ini hanya berisi komentar. Tidak ada pernyataan SQL yang bisa
 -- dieksekusi. Isinya adalah rancangan dua indeks beserta bukti rencana
 -- eksekusi sebelum dan sesudah indeks terpasang.
 --
--- Daftar TODO Anggota 5. Ganti [ ] menjadi [x] setelah indeks dibuktikan.
+-- Daftar TODO Kafka. Ganti [ ] menjadi [x] setelah indeks dibuktikan.
 -- [ ] idx_pasien_nama pada pasien(nama_pasien)
 -- [ ] idx_kunjungan_tanggal pada kunjungan(tanggal_kunjungan, id_jadwal)
 -- [ ] EXPLAIN sebelum dan sesudah untuk kedua query
@@ -26,7 +26,7 @@
 --   tanggal, dan laporan yang menyaring tanggal sekaligus jadwal.
 --
 -- Nama, tabel, kolom, dan urutan kolom mengikuti PRD bagian 8.5 dan
--- panduan Anggota 5 Milestone 5. Tipe data kolom tidak disalin di sini, lihat
+-- panduan Kafka Milestone 5. Tipe data kolom tidak disalin di sini, lihat
 -- ../../docs/PRD.md bagian 5.2.
 
 -- ---------------------------------------------------------------------

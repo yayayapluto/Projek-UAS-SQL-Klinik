@@ -1,17 +1,17 @@
 -- =====================================================================
 -- 07_pengujian.sql
--- Pemilik : Anggota 6
+-- Pemilik : Rassya
 -- Fase    : F3 uji-hijau
 -- Butuh   : 01_struktur.sql sampai 06_indeks.sql, dimuat lewat
 --           bash tools/reset-db.sh sebelum berkas ini dijalankan.
--- Sumber  : PRD bagian 10 dan 11, panduan Anggota 6
+-- Sumber  : PRD bagian 10 dan 11, panduan Rassya
 -- Tautan  : ../../docs/PRD.md dan ../../docs/panduan-anggota-6-pengujian-rilis.md
 -- =====================================================================
 -- Berkas ini hanya berisi komentar. Tidak ada pernyataan SQL yang bisa
 -- dieksekusi. Isinya adalah cetak biru sepuluh skenario pengujian.
 -- Versi final berisi pernyataan nyata dan dikerjakan pada repo kerja.
 --
--- Daftar TODO Anggota 6. Ganti [ ] menjadi [x] setelah uji dijalankan.
+-- Daftar TODO Rassya. Ganti [ ] menjadi [x] setelah uji dijalankan.
 -- [ ] Uji 1 antrean ganda
 -- [ ] Uji 2 pasien tidak terdaftar
 -- [ ] Uji 3 suhu di luar rentang

@@ -1,16 +1,16 @@
 -- =====================================================================
 -- 03_view_trigger.sql
--- Pemilik : Anggota 4
+-- Pemilik : Kenzie
 -- Fase    : F2 objek-sql
 -- Butuh   : 01_struktur.sql dan 02_data.sql
--- Sumber  : PRD bagian 6 dan 8, panduan Anggota 4
+-- Sumber  : PRD bagian 6 dan 8, panduan Kenzie
 -- Tautan  : ../../docs/PRD.md dan ../../docs/panduan-anggota-4-view-trigger-prosedur.md
 -- =====================================================================
 -- Berkas ini hanya berisi komentar. Tidak ada pernyataan SQL yang bisa
 -- dieksekusi. Isinya adalah rancangan dua view dan empat trigger untuk
 -- Sistem Informasi Klinik Pratama.
 --
--- Daftar TODO Anggota 4. Ganti [ ] menjadi [x] setelah objek diuji.
+-- Daftar TODO Kenzie. Ganti [ ] menjadi [x] setelah objek diuji.
 -- [ ] view v_kunjungan_lengkap
 -- [ ] view v_pendapatan_poli
 -- [ ] trigger trg_cek_kuota_jadwal

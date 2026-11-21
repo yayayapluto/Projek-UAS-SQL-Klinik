@@ -6,14 +6,14 @@ Paket ini adalah kerangka kerja SQL untuk tim baru yang mengerjakan proyek Klini
 
 | Berkas | Pemilik | Isi |
 | --- | --- | --- |
-| `sql/00-kesepakatan.sql` | Anggota 1 | Kesepakatan nama objek, aturan bisnis, kardinalitas, dan kebutuhan informasi. |
-| `sql/01_struktur.sql` | Anggota 3 | Sebelas tabel dasar beserta kunci primer, kunci asing, dan constraint. |
-| `sql/02_data.sql` | Anggota 2 | Jumlah baris, urutan pengisian, dan keadaan khusus data contoh untuk sebelas tabel. |
-| `sql/03_view_trigger.sql` | Anggota 4 | Dua view dan empat trigger kuota, bentrok jadwal, serta stok obat. |
-| `sql/04_prosedur.sql` | Anggota 1 | Dua prosedur pendaftaran kunjungan dan pembayaran. |
-| `sql/05_keamanan.sql` | Anggota 5 | Tiga user klinik beserta hak aksesnya. |
-| `sql/06_indeks.sql` | Anggota 4 | Dua indeks untuk pencarian pasien dan rentang tanggal kunjungan. |
-| `sql/07_pengujian.sql` | Anggota 6 | Sepuluh uji perilaku untuk constraint, trigger, prosedur, view, dan hak akses. |
+| `sql/00-kesepakatan.sql` | Agit | Kesepakatan nama objek, aturan bisnis, kardinalitas, dan kebutuhan informasi. |
+| `sql/01_struktur.sql` | Farras | Sebelas tabel dasar beserta kunci primer, kunci asing, dan constraint. |
+| `sql/02_data.sql` | Dapa | Jumlah baris, urutan pengisian, dan keadaan khusus data contoh untuk sebelas tabel. |
+| `sql/03_view_trigger.sql` | Kenzie | Dua view dan empat trigger kuota, bentrok jadwal, serta stok obat. |
+| `sql/04_prosedur.sql` | Agit | Dua prosedur pendaftaran kunjungan dan pembayaran. |
+| `sql/05_keamanan.sql` | Kafka | Tiga user klinik beserta hak aksesnya. |
+| `sql/06_indeks.sql` | Kenzie | Dua indeks untuk pencarian pasien dan rentang tanggal kunjungan. |
+| `sql/07_pengujian.sql` | Rassya | Sepuluh uji perilaku untuk constraint, trigger, prosedur, view, dan hak akses. |
 
 ## Cara Pakai
 
@@ -44,7 +44,7 @@ Tipe data dan detail tipe tidak disalin di scaffold. Rujuk PRD di ZIP panduan, b
 
 ## Tool Pendukung
 
-Paket ini belum menyertakan `tools/reset-db.sh`, `tools/verify.sh`, dan `tools/demo-isolasi.sh`. Ketiganya ditulis Anggota 6 pada Fase F3 mengikuti panduan Anggota 6 di ZIP panduan.
+Paket ini belum menyertakan `tools/reset-db.sh`, `tools/verify.sh`, dan `tools/demo-isolasi.sh`. Ketiganya ditulis Rassya pada Fase F3 mengikuti panduan Rassya di ZIP panduan.
 
 Perintah pemeriksaan di dalam scaffold memakai path repo kerja seperti `bash tools/reset-db.sh` dan `bash tools/verify.sh`. Perintah itu baru berguna setelah ketiga tool tersebut tersedia.
 
@@ -59,4 +59,4 @@ Pekerjaan dinyatakan selesai jika seluruh kondisi berikut terpenuhi.
 
 ## Rujukan
 
-- PRD, Pembagian Tugas, dan panduan Anggota 6 ada di ZIP panduan.
+- PRD, Pembagian Tugas, dan panduan Rassya ada di ZIP panduan.

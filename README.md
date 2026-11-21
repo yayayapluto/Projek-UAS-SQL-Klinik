@@ -11,16 +11,18 @@ hasil ekstrak ZIP itu, bukan isi repo ini.
 
 ## Isi Repo
 
+Anggota tim: Agit (1), Dapa (2), Farras (3), Kenzie (4), Kafka (5), Rassya (6).
+
 | Berkas | Pemilik | Isi |
 | --- | --- | --- |
-| `sql/00-kesepakatan.sql` | Anggota 1 | kesepakatan nama objek, aturan bisnis, kardinalitas, kebutuhan informasi |
-| `sql/01_struktur.sql` | Anggota 3 | sebelas tabel, kunci, dan constraint |
-| `sql/02_data.sql` | Anggota 2 | jumlah baris dan keadaan khusus data contoh |
-| `sql/03_view_trigger.sql` | Anggota 4 | dua view dan empat trigger |
-| `sql/04_prosedur.sql` | Anggota 1 | dua prosedur pendaftaran dan pembayaran |
-| `sql/05_keamanan.sql` | Anggota 5 | tiga pengguna dan hak akses |
-| `sql/06_indeks.sql` | Anggota 4 | dua indeks dan bukti EXPLAIN |
-| `sql/07_pengujian.sql` | Anggota 6 | sepuluh skenario pengujian |
+| `sql/00-kesepakatan.sql` | Agit | kesepakatan nama objek, aturan bisnis, kardinalitas, kebutuhan informasi |
+| `sql/01_struktur.sql` | Farras | sebelas tabel, kunci, dan constraint |
+| `sql/02_data.sql` | Dapa | jumlah baris dan keadaan khusus data contoh |
+| `sql/03_view_trigger.sql` | Kenzie | dua view dan empat trigger |
+| `sql/04_prosedur.sql` | Agit | dua prosedur pendaftaran dan pembayaran |
+| `sql/05_keamanan.sql` | Kafka | tiga pengguna dan hak akses |
+| `sql/06_indeks.sql` | Kenzie | dua indeks dan bukti EXPLAIN |
+| `sql/07_pengujian.sql` | Rassya | sepuluh skenario pengujian |
 
 Setiap berkas hanya berisi komentar dan daftar TODO. Ganti `[ ]` menjadi `[x]`
 setelah bagian itu selesai.
@@ -33,7 +35,7 @@ cd Projek-UAS-SQL-Klinik
 ```
 
 Prasyarat, pembuatan database, dan urutan resmi ada di ZIP panduan. Tool
-`reset-db.sh`, `verify.sh`, dan `demo-isolasi.sh` ditulis Anggota 6 pada Fase F3.
+`reset-db.sh`, `verify.sh`, dan `demo-isolasi.sh` ditulis Rassya pada Fase F3.
 
 ## Alur Kerja
 

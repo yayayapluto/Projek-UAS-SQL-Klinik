@@ -1,9 +1,9 @@
 -- =====================================================================
 -- 01_struktur.sql
--- Pemilik : Anggota 3
+-- Pemilik : Farras
 -- Fase    : F1 skema-v1
 -- Butuh   : tidak ada
--- Sumber  : PRD bagian 5 dan 10, panduan Anggota 3
+-- Sumber  : PRD bagian 5 dan 10, panduan Farras
 -- Tautan  : ../../docs/PRD.md dan ../../docs/panduan-anggota-3-struktur-transformasi.md
 -- =====================================================================
 -- Berkas ini hanya berisi komentar. Tidak ada pernyataan SQL yang bisa
@@ -11,7 +11,7 @@
 -- ../../docs/PRD.md bagian 5.2. Berkas ini mencatat nama objek yang beku:
 -- tabel, kolom, kunci primer, kunci tamu, dan constraint.
 --
--- Daftar TODO Anggota 3. Ganti [ ] menjadi [x] setelah objek selesai.
+-- Daftar TODO Farras. Ganti [ ] menjadi [x] setelah objek selesai.
 -- [ ] database klinik_pratama, utf8mb4, utf8mb4_unicode_ci
 -- [ ] urutan DROP TABLE dari anak ke induk
 -- [ ] tabel poli
@@ -146,7 +146,7 @@
 --   ck_rekam_tinggi: tinggi_badan antara 30.0 dan 250.0.
 -- Kolom turunan:
 --   imt adalah generated column STORED, dihitung database dari
---   berat_badan dan tinggi_badan memakai rumus pada panduan Anggota 3 bagian
+--   berat_badan dan tinggi_badan memakai rumus pada panduan Farras bagian
 --   2.4. Kolom ini tidak diisi saat INSERT.
 -- Kunci tamu:
 --   fk_rekam_kunjungan: id_kunjungan merujuk kunjungan(id_kunjungan),

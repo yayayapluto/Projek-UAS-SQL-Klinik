@@ -1,9 +1,9 @@
 -- =====================================================================
 -- 00-kesepakatan.sql
--- Pemilik : Anggota 1
+-- Pemilik : Agit
 -- Fase    : F0 kesepakatan-v1
 -- Butuh   : tidak ada
--- Sumber  : PRD bagian 5 sampai 7, panduan Anggota 1
+-- Sumber  : PRD bagian 5 sampai 7, panduan Agit
 -- Tautan  : ../../docs/PRD.md dan ../../docs/panduan-anggota-1-kontrak-erd.md
 -- =====================================================================
 -- Berkas ini hanya berisi komentar. Tidak ada pernyataan SQL yang bisa
