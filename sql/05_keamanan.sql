@@ -1,51 +1,151 @@
 -- =====================================================================
--- 05_keamanan.sql — KUNCI JAWABAN
+-- 05_keamanan.sql
 -- Pemilik : P4
--- Tiga pengguna dan hak aksesnya sesuai PRD bagian 8.4.
+-- Fase    : F2 objek-sql
+-- Butuh   : 01_struktur.sql
+-- Sumber  : PRD bagian 8, panduan P4
+-- Tautan  : ../../docs/PRD.md dan ../../docs/panduan-P4-view-trigger-prosedur.md
 -- =====================================================================
-USE klinik_pratama;
+-- Berkas ini hanya berisi komentar. Tidak ada pernyataan SQL yang bisa
+-- dieksekusi. Isinya adalah rancangan tiga pengguna database beserta
+-- hak aksesnya pada database klinik_pratama.
+--
+-- Jalankan sebagai root. Skrip memakai DROP USER IF EXISTS agar aman
+-- diulang, lalu membuat pengguna baru dengan host %, lalu memberi hak,
+-- lalu FLUSH PRIVILEGES, lalu menampilkan SHOW GRANTS sebagai bukti.
+--
+-- Daftar TODO P4. Ganti [ ] menjadi [x] setelah hak diuji.
+-- [ ] pengguna petugas_klinik dan haknya
+-- [ ] pengguna dokter_klinik dan haknya
+-- [ ] pengguna admin_klinik dan haknya
+-- [ ] SHOW GRANTS dan bukti penolakan 1142
 
-DROP USER IF EXISTS 'petugas_klinik'@'%';
-DROP USER IF EXISTS 'petugas_klinik'@'localhost';
-DROP USER IF EXISTS 'dokter_klinik'@'%';
-DROP USER IF EXISTS 'dokter_klinik'@'localhost';
-DROP USER IF EXISTS 'admin_klinik'@'%';
-DROP USER IF EXISTS 'admin_klinik'@'localhost';
+-- ---------------------------------------------------------------------
+-- 1. Pengguna yang dibuat
+-- ---------------------------------------------------------------------
+-- Tiga akun, semuanya host % supaya bisa dipakai dari container lain.
+-- Kata sandi sama untuk latihan: Klinik#2026.
+--
+-- petugas_klinik : meja depan.
+--   SELECT pada poli, dokter, jadwal_praktik.
+--   SELECT dan INSERT pada pasien serta kunjungan.
+--   Tidak boleh menyentuh obat, rekam_medis, pembayaran.
+--
+-- dokter_klinik : tenaga medis.
+--   SELECT pada seluruh tabel database klinik_pratama.
+--   INSERT dan UPDATE pada rekam_medis dan detail_resep.
+--
+-- admin_klinik : pengelola sistem.
+--   ALL PRIVILEGES pada klinik_pratama.
+--
+-- Urutan perintah yang dijalankan:
+--   DROP USER IF EXISTS untuk ketiga akun.
+--   CREATE USER untuk ketiga akun.
+--   GRANT SELECT untuk petugas_klinik pada poli.
+--   GRANT SELECT untuk petugas_klinik pada dokter.
+--   GRANT SELECT untuk petugas_klinik pada jadwal_praktik.
+--   GRANT SELECT dan INSERT untuk petugas_klinik pada pasien.
+--   GRANT SELECT dan INSERT untuk petugas_klinik pada kunjungan.
+--   GRANT SELECT untuk dokter_klinik pada klinik_pratama.*
+--   GRANT INSERT dan UPDATE untuk dokter_klinik pada rekam_medis.
+--   GRANT INSERT dan UPDATE untuk dokter_klinik pada detail_resep.
+--   GRANT ALL PRIVILEGES untuk admin_klinik pada klinik_pratama.*
+--   FLUSH PRIVILEGES.
+--   SHOW GRANTS untuk ketiga akun.
+--
+-- Tipe data dan detail kolom tidak diulang di sini. Lihat
+-- ../../docs/PRD.md bagian 8.4 untuk tabel hak akses dan alasannya.
 
-CREATE USER 'petugas_klinik'@'%' IDENTIFIED BY 'Klinik#2026';
-CREATE USER 'petugas_klinik'@'localhost' IDENTIFIED BY 'Klinik#2026';
-CREATE USER 'dokter_klinik'@'%' IDENTIFIED BY 'Klinik#2026';
-CREATE USER 'dokter_klinik'@'localhost' IDENTIFIED BY 'Klinik#2026';
-CREATE USER 'admin_klinik'@'%' IDENTIFIED BY 'Klinik#2026';
-CREATE USER 'admin_klinik'@'localhost' IDENTIFIED BY 'Klinik#2026';
+-- ---------------------------------------------------------------------
+-- 2. Akun petugas_klinik
+-- ---------------------------------------------------------------------
+-- Akun ini dipakai saat pendaftaran pasien di meja depan.
+-- Tanpa hak pada obat: petugas tidak boleh mengubah stok.
+-- Tanpa hak pada rekam_medis: isi pemeriksaan bersifat medis.
+-- Tanpa hak pada pembayaran: kasir memakai akun lain pada skenario nyata.
+--
+-- Perintah yang dirancang, masih berupa komentar:
+--   DROP USER IF EXISTS 'petugas_klinik'@'%';
+--   CREATE USER 'petugas_klinik'@'%' IDENTIFIED BY 'Klinik#2026';
+--   GRANT SELECT ON klinik_pratama.poli TO 'petugas_klinik'@'%';
+--   GRANT SELECT ON klinik_pratama.dokter TO 'petugas_klinik'@'%';
+--   GRANT SELECT ON klinik_pratama.jadwal_praktik TO 'petugas_klinik'@'%';
+--   GRANT SELECT, INSERT ON klinik_pratama.pasien TO 'petugas_klinik'@'%';
+--   GRANT SELECT, INSERT ON klinik_pratama.kunjungan TO 'petugas_klinik'@'%';
 
--- Petugas meja depan: baca jadwal, daftarkan pasien. Tidak boleh menulis
--- rekam medis, obat, atau pembayaran.
-GRANT SELECT ON `klinik_pratama`.`poli` TO 'petugas_klinik'@'%';
-GRANT SELECT ON `klinik_pratama`.`dokter` TO 'petugas_klinik'@'%';
-GRANT SELECT ON `klinik_pratama`.`jadwal_praktik` TO 'petugas_klinik'@'%';
-GRANT SELECT, INSERT ON `klinik_pratama`.`pasien` TO 'petugas_klinik'@'%';
-GRANT SELECT, INSERT ON `klinik_pratama`.`kunjungan` TO 'petugas_klinik'@'%';
+-- ---------------------------------------------------------------------
+-- 3. Akun dokter_klinik
+-- ---------------------------------------------------------------------
+-- Akun ini dipakai saat pemeriksaan dan penulisan resep.
+-- SELECT pada seluruh database memberi akses baca riwayat kunjungan.
+-- INSERT dan UPDATE pada rekam_medis untuk mencatat hasil periksa.
+-- INSERT dan UPDATE pada detail_resep untuk menulis resep.
+-- Tidak ada DELETE, karena riwayat medis tidak dihapus.
+--
+-- Perintah yang dirancang, masih berupa komentar:
+--   DROP USER IF EXISTS 'dokter_klinik'@'%';
+--   CREATE USER 'dokter_klinik'@'%' IDENTIFIED BY 'Klinik#2026';
+--   GRANT SELECT ON klinik_pratama.* TO 'dokter_klinik'@'%';
+--   GRANT INSERT, UPDATE ON klinik_pratama.rekam_medis TO 'dokter_klinik'@'%';
+--   GRANT INSERT, UPDATE ON klinik_pratama.detail_resep TO 'dokter_klinik'@'%';
 
-GRANT SELECT ON `klinik_pratama`.`poli` TO 'petugas_klinik'@'localhost';
-GRANT SELECT ON `klinik_pratama`.`dokter` TO 'petugas_klinik'@'localhost';
-GRANT SELECT ON `klinik_pratama`.`jadwal_praktik` TO 'petugas_klinik'@'localhost';
-GRANT SELECT, INSERT ON `klinik_pratama`.`pasien` TO 'petugas_klinik'@'localhost';
-GRANT SELECT, INSERT ON `klinik_pratama`.`kunjungan` TO 'petugas_klinik'@'localhost';
+-- ---------------------------------------------------------------------
+-- 4. Akun admin_klinik
+-- ---------------------------------------------------------------------
+-- Akun pengelola sistem. Dipakai untuk pemeliharaan, perubahan struktur,
+-- dan pemulihan data. Hak penuh pada satu database, bukan pada server.
+--
+-- Perintah yang dirancang, masih berupa komentar:
+--   DROP USER IF EXISTS 'admin_klinik'@'%';
+--   CREATE USER 'admin_klinik'@'%' IDENTIFIED BY 'Klinik#2026';
+--   GRANT ALL PRIVILEGES ON klinik_pratama.* TO 'admin_klinik'@'%';
 
--- Dokter: baca semua, tulis rekam medis dan resep.
-GRANT SELECT ON `klinik_pratama`.* TO 'dokter_klinik'@'%';
-GRANT INSERT, UPDATE ON `klinik_pratama`.`rekam_medis` TO 'dokter_klinik'@'%';
-GRANT INSERT, UPDATE ON `klinik_pratama`.`detail_resep` TO 'dokter_klinik'@'%';
+-- ---------------------------------------------------------------------
+-- 5. Penutup skrip
+-- ---------------------------------------------------------------------
+-- Ketiga akun dibuat, ketiga blok hak diberikan, lalu privilege dimuat
+-- ulang. Tanpa FLUSH PRIVILEGES, perubahan biasanya tetap berlaku, tetapi
+-- perintah ini menjamin tabel grant di memori ikut segar.
+--
+-- Perintah yang dirancang, masih berupa komentar:
+--   FLUSH PRIVILEGES;
+--   SHOW GRANTS FOR 'petugas_klinik'@'%';
+--   SHOW GRANTS FOR 'dokter_klinik'@'%';
+--   SHOW GRANTS FOR 'admin_klinik'@'%';
+--
+-- SHOW GRANTS harus menampilkan baris untuk tiap tabel yang disebut di
+-- atas. Baris USAGE hanya penanda akun dan bukan hak tambahan.
 
-GRANT SELECT ON `klinik_pratama`.* TO 'dokter_klinik'@'localhost';
-GRANT INSERT, UPDATE ON `klinik_pratama`.`rekam_medis` TO 'dokter_klinik'@'localhost';
-GRANT INSERT, UPDATE ON `klinik_pratama`.`detail_resep` TO 'dokter_klinik'@'localhost';
-
--- Admin: hak penuh untuk pemeliharaan.
-GRANT ALL PRIVILEGES ON `klinik_pratama`.* TO 'admin_klinik'@'%' WITH GRANT OPTION;
-GRANT ALL PRIVILEGES ON `klinik_pratama`.* TO 'admin_klinik'@'localhost' WITH GRANT OPTION;
-
-SHOW GRANTS FOR 'petugas_klinik'@'%';
-SHOW GRANTS FOR 'dokter_klinik'@'%';
-SHOW GRANTS FOR 'admin_klinik'@'%';
+-- ---------------------------------------------------------------------
+-- Pemeriksaan
+-- ---------------------------------------------------------------------
+-- Berkas ini tidak dieksekusi sendirian. Pemeriksaan memakai tool repo
+-- kerja, sama seperti berkas scaffold lain.
+--
+--   bash tools/reset-db.sh
+--   Keluaran diharapkan: 05_keamanan.sql dieksekusi tanpa error dan
+--   database klinik_pratama berisi tiga pengguna.
+--
+--   bash tools/verify.sh
+--   Bagian F harus lulus tiga pemeriksaan:
+--   satu untuk GRANT petugas_klinik, satu untuk GRANT dokter_klinik,
+--   satu untuk penolakan INSERT ke obat dengan galat 1142.
+--   Total keseluruhan tetap 34 pemeriksaan lulus.
+--
+--   Uji 10 pada 07_pengujian.sql menampilkan daftar grant:
+--   SHOW GRANTS FOR 'petugas_klinik'@'%';
+--   Keluaran diharapkan: baris SELECT pada poli, dokter, jadwal_praktik,
+--   serta SELECT dan INSERT pada pasien dan kunjungan.
+--
+--   Percobaan INSERT ke obat oleh petugas_klinik dijalankan terpisah
+--   sebagai akun tersebut, bukan sebagai root. Contoh perintah:
+--   docker exec -i kbd-mysql mysql -upetugas_klinik -p'Klinik#2026' \
+--     klinik_pratama -e "INSERT INTO obat (nama_obat, satuan, harga, stok) \
+--     VALUES ('Uji Ilegal', 'Tablet', 1000.00, 1);"
+--   Keluaran diharapkan: ERROR 1142 (42000), dengan pesan command denied
+--   untuk pengguna petugas_klinik pada tabel obat.
+--
+--   Untuk memastikan berkas ini hanya komentar:
+--   grep -v '^--' 05_keamanan.sql | grep -v '^$'
+--   Keluaran diharapkan: kosong.
+-- =====================================================================

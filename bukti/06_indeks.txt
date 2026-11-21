@@ -1,8 +1,0 @@
-index_name	table_name	seq_in_index	column_name
-idx_kunjungan_tanggal	kunjungan	1	tanggal_kunjungan
-idx_kunjungan_tanggal	kunjungan	2	id_jadwal
-idx_pasien_nama	pasien	1	nama_pasien
-id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
-1	SIMPLE	pasien	range	idx_pasien_nama	idx_pasien_nama	402	NULL	2	Using index condition
-id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
-1	SIMPLE	kunjungan	ref	idx_kunjungan_tanggal	idx_kunjungan_tanggal	3	const	1	
