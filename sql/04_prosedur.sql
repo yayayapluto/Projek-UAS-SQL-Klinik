@@ -1,6 +1,6 @@
 -- =====================================================================
 -- 04_prosedur.sql
--- Pemilik : Anggota 4
+-- Pemilik : Anggota 1
 -- Fase    : F2 objek-sql
 -- Butuh   : 01_struktur.sql dan 02_data.sql
 -- Sumber  : PRD bagian 6 dan 8, panduan Anggota 4
