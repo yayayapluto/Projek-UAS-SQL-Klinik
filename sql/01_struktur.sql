@@ -1,17 +1,17 @@
 -- =====================================================================
 -- 01_struktur.sql
--- Pemilik : P3
+-- Pemilik : Anggota 3
 -- Fase    : F1 skema-v1
 -- Butuh   : tidak ada
--- Sumber  : PRD bagian 5 dan 10, panduan P3
--- Tautan  : ../../docs/PRD.md dan ../../docs/panduan-P3-struktur-transformasi.md
+-- Sumber  : PRD bagian 5 dan 10, panduan Anggota 3
+-- Tautan  : ../../docs/PRD.md dan ../../docs/panduan-anggota-3-struktur-transformasi.md
 -- =====================================================================
 -- Berkas ini hanya berisi komentar. Tidak ada pernyataan SQL yang bisa
 -- dieksekusi. Semua tipe data, nilai ENUM, dan aturan DEFAULT dibaca dari
 -- ../../docs/PRD.md bagian 5.2. Berkas ini mencatat nama objek yang beku:
 -- tabel, kolom, kunci primer, kunci tamu, dan constraint.
 --
--- Daftar TODO P3. Ganti [ ] menjadi [x] setelah objek selesai.
+-- Daftar TODO Anggota 3. Ganti [ ] menjadi [x] setelah objek selesai.
 -- [ ] database klinik_pratama, utf8mb4, utf8mb4_unicode_ci
 -- [ ] urutan DROP TABLE dari anak ke induk
 -- [ ] tabel poli
@@ -146,7 +146,7 @@
 --   ck_rekam_tinggi: tinggi_badan antara 30.0 dan 250.0.
 -- Kolom turunan:
 --   imt adalah generated column STORED, dihitung database dari
---   berat_badan dan tinggi_badan memakai rumus pada panduan P3 bagian
+--   berat_badan dan tinggi_badan memakai rumus pada panduan Anggota 3 bagian
 --   2.4. Kolom ini tidak diisi saat INSERT.
 -- Kunci tamu:
 --   fk_rekam_kunjungan: id_kunjungan merujuk kunjungan(id_kunjungan),
