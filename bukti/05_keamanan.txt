@@ -1,0 +1,15 @@
+Grants for petugas_klinik@%
+GRANT USAGE ON *.* TO `petugas_klinik`@`%` IDENTIFIED BY PASSWORD '*B9BC6D77AB4F7651FEA8AE76CBF94CD93283314B'
+GRANT SELECT, INSERT ON `klinik_pratama`.`kunjungan` TO `petugas_klinik`@`%`
+GRANT SELECT ON `klinik_pratama`.`dokter` TO `petugas_klinik`@`%`
+GRANT SELECT ON `klinik_pratama`.`poli` TO `petugas_klinik`@`%`
+GRANT SELECT, INSERT ON `klinik_pratama`.`pasien` TO `petugas_klinik`@`%`
+GRANT SELECT ON `klinik_pratama`.`jadwal_praktik` TO `petugas_klinik`@`%`
+Grants for dokter_klinik@%
+GRANT USAGE ON *.* TO `dokter_klinik`@`%` IDENTIFIED BY PASSWORD '*B9BC6D77AB4F7651FEA8AE76CBF94CD93283314B'
+GRANT SELECT ON `klinik_pratama`.* TO `dokter_klinik`@`%`
+GRANT INSERT, UPDATE ON `klinik_pratama`.`detail_resep` TO `dokter_klinik`@`%`
+GRANT INSERT, UPDATE ON `klinik_pratama`.`rekam_medis` TO `dokter_klinik`@`%`
+Grants for admin_klinik@%
+GRANT USAGE ON *.* TO `admin_klinik`@`%` IDENTIFIED BY PASSWORD '*B9BC6D77AB4F7651FEA8AE76CBF94CD93283314B'
+GRANT ALL PRIVILEGES ON `klinik_pratama`.* TO `admin_klinik`@`%` WITH GRANT OPTION
