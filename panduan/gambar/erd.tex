@@ -1,0 +1,83 @@
+% =====================================================================
+% gambar/erd.tex
+% Diagram relasi entitas Sistem Informasi Klinik Pratama.
+% Atribut tidak digambar supaya diagram tetap terbaca; daftar atribut
+% lengkap ada pada kamus data di Bab I.
+%
+% detail_tindakan dan detail_resep digambar sebagai entitas penghubung.
+% Tanda (M:N) di dalam kotaknya menandai bahwa entitas itu lahir dari
+% relasi banyak-ke-banyak, bukan dari entitas bisnis.
+% =====================================================================
+\begin{tikzpicture}[
+  entitas/.style={rectangle,draw,fill=blue!8,rounded corners=2pt,
+                  minimum width=2.5cm,minimum height=0.95cm,
+                  align=center,font=\footnotesize\ttfamily},
+  penghubung/.style={rectangle,draw,fill=blue!8,rounded corners=2pt,
+                  minimum width=3.1cm,minimum height=1.2cm,
+                  align=center,font=\footnotesize\ttfamily},
+  relasi/.style={diamond,draw,fill=orange!12,aspect=1.6,
+                 inner sep=1pt,font=\scriptsize},
+  garis/.style={draw,thick},
+  label/.style={font=\scriptsize\bfseries}
+]
+
+% ---------------- entitas ----------------
+\node[entitas] (poli)   at (0,10.5)    {poli};
+\node[entitas] (dokter) at (5.6,10.5)  {dokter};
+\node[entitas] (jadwal) at (11.6,10.5) {jadwal\_praktik};
+
+\node[entitas] (pasien)    at (0,6.3)    {pasien};
+\node[entitas] (kunjungan) at (5.8,6.3)  {kunjungan};
+\node[entitas] (rekam)     at (11.6,6.3) {rekam\_medis};
+
+\node[entitas]    (tindakan)        at (-1.0,2.6)   {tindakan};
+\node[penghubung] (detail_tindakan) at (4.2,2.6)    {detail\_tindakan\\\scriptsize (M:N)};
+\node[penghubung] (detail_resep)    at (10.3,2.6)   {detail\_resep\\\scriptsize (M:N)};
+\node[entitas]    (obat)            at (15.4,2.6)   {obat};
+
+\node[entitas] (pembayaran) at (6.6,0.0) {pembayaran};
+
+% ---------------- relasi ----------------
+\node[relasi] (rel_pd) at (2.8,10.5)  {memiliki};
+\node[relasi] (rel_dj) at (8.6,10.5)  {punya};
+\node[relasi] (rel_pk) at (2.9,6.3)   {mendaftar};
+\node[relasi] (rel_jk) at (9.0,8.4)   {diisi};
+\node[relasi] (rel_kr) at (8.75,6.3)  {menghasilkan};
+\node[relasi] (rel_kb) at (6.6,1.5)   {ditagih};
+\node[relasi] (rel_mt) at (5.0,4.5)   {menerima};
+\node[relasi] (rel_td) at (1.4,2.6)   {dirinci};
+\node[relasi] (rel_rr) at (10.95,4.5) {menulis};
+\node[relasi] (rel_od) at (13.0,2.6)  {dirujuk};
+
+% ---------------- garis dan kardinalitas ----------------
+\draw[garis] (poli) -- node[above,label]{1} (rel_pd);
+\draw[garis] (rel_pd) -- node[above,label]{N} (dokter);
+
+\draw[garis] (dokter) -- node[above,label]{1} (rel_dj);
+\draw[garis] (rel_dj) -- node[above,label]{N} (jadwal);
+
+\draw[garis] (pasien) -- node[above,label]{1} (rel_pk);
+\draw[garis] (rel_pk) -- node[above,label]{N} (kunjungan);
+
+\draw[garis] (jadwal.south west) -- node[above right,label]{1} (rel_jk);
+\draw[garis] (rel_jk) -- node[below right,label]{N} (kunjungan.north east);
+
+\draw[garis] (kunjungan) -- node[above,label]{1} (rel_kr);
+\draw[garis] (rel_kr) -- node[above,label]{0..1} (rekam);
+
+\draw[garis] (kunjungan.south east) -- node[right,label]{1} (rel_kb);
+\draw[garis] (rel_kb) -- node[right,label]{0..1} (pembayaran);
+
+\draw[garis] (kunjungan.south) -- node[left,label]{1} (rel_mt);
+\draw[garis] (rel_mt) -- node[left,label]{N} (detail_tindakan.north);
+
+\draw[garis] (tindakan) -- node[above,label]{N} (rel_td);
+\draw[garis] (rel_td) -- node[above,label]{1} (detail_tindakan);
+
+\draw[garis] (rekam.south) -- node[right,label]{1} (rel_rr);
+\draw[garis] (rel_rr) -- node[right,label]{N} (detail_resep.north);
+
+\draw[garis] (detail_resep) -- node[above,label]{N} (rel_od);
+\draw[garis] (rel_od) -- node[above,label]{1} (obat);
+
+\end{tikzpicture}
