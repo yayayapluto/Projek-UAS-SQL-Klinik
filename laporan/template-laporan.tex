@@ -445,15 +445,15 @@ Pemanggilan pembayaran kedua ditolak dengan pesan \texttt{Kunjungan sudah
 dibayar}, dan percobaan insert yang gagal tidak menyisakan baris. Demo isolasi
 menunjukkan perbedaan dua tingkat isolasi pada kasus yang sama: pada READ
 COMMITTED pembacaan kedua melihat stok 195, sedangkan pada REPEATABLE READ
-pembacaan kedua tetap 195 setelah sesi lain mengubah nilainya, sesuai aturan
+pembacaan kedua tetap 95 setelah sesi lain mengubah nilainya, sesuai aturan
 tingkat isolasi tersebut.
 
 Hak akses dan indeks juga terbukti bekerja. Akun \texttt{petugas\_klinik}
 ditolak saat mencoba menulis ke tabel \texttt{obat} dengan galat 1142. Setelah
 \texttt{idx\_pasien\_nama} dibuat, rencana eksekusi berubah dari pemindaian
-penuh 10 baris menjadi pencarian rentang 1 baris; pada
+penuh 10 baris menjadi pencarian rentang 2 baris; pada
 \texttt{idx\_kunjungan\_tanggal} jumlah baris yang diperiksa turun dari 14
-menjadi 3.
+menjadi 1.
 
 \subsection{Kendala}
 

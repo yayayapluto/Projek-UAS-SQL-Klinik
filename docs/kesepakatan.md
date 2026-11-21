@@ -99,8 +99,8 @@ Kebutuhan ditulis sebagai pertanyaan supaya bisa langsung diuji dengan query.
 | 3 | Bagaimana riwayat kunjungan lengkap: pasien, dokter, poli, status? | Q3 | 14 baris |
 | 4 | Berapa sisa kuota setiap jadwal praktik saat ini? | Q4 | jadwal 7 sisa 0 |
 | 5 | Kunjungan mana yang tagihannya belum lunas? | Q5 | 3 baris |
-| 6 | Pasien mana yang pernah dirujuk ke Poli Anak? | Q6 | 2 pasien |
-| 7 | Poli mana yang pendapatannya di atas rata-rata? | Q7 | Poli Umum, Poli Gigi, Poli Penyakit Dalam |
+| 6 | Pasien mana yang pernah dirujuk ke Poli Anak? | Q6 | 6 pasien |
+| 7 | Poli mana yang pendapatannya di atas rata-rata? | Q7 | Poli Anak |
 | 8 | Obat apa yang paling banyak keluar, dan dokter mana yang menangani kunjungan terbanyak? | Q8, Q10 | Amlodipine 5mg 60 tablet; dr. Andi Pratama peringkat 1 |
 
 Q9 (kategori biaya kunjungan dengan `CASE`) tidak berasal langsung dari satu

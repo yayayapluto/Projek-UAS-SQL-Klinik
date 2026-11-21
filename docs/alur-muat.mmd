@@ -1,0 +1,7 @@
+flowchart TB
+  A[reset-db.sh] --> B["01 struktur + 02 data"]
+  B --> C["03 view/trigger + 04 prosedur"]
+  C --> D["05 keamanan + 06 indeks"]
+  D --> E["verify.sh 34 cek"]
+  E --> F["07 pengujian"]
+  F --> G["08 kueri Q1-Q10"]
